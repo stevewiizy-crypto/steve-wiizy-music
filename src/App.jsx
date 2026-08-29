@@ -20,10 +20,23 @@ return (
 
 <section id="music" style={{padding:'20px 16px'}}>
 <h3>Music Categories • All, Dedication, Love, Birthday, Appreciation, School, Motivation</h3>
-<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'12px',marginTop:'12px'}}>
-{[{t:'Your Story Anthem',c:'🎤'},{t:'Birthday For Bestie',c:'🎂'},{t:'Thank You Mama',c:'❤️'},{t:'My School Pride',c:'🎓'},{t:'Love Letter',c:'💌'},{t:'Hustle Motivation',c:'🔥'}].map((s,i)=><div key={i} style={{background:'#121212',border:'1px solid #222',borderRadius:'16px',padding:'16px',textAlign:'center'}}><div style={{fontSize:'32px'}}>{s.c}</div><div style={{fontWeight:700,fontSize:'13px',marginTop:'8px'}}>{s.t}</div><div style={{display:'flex',gap:'6px',justifyContent:'center',marginTop:'8px'}}><span>❤️</span><span>⭐</span><span>↗️</span><span>⬇️</span></div></div>)}
+{[
+{t:'Endless Love Swing', f:'/Endless%20Love%20Swing.mp3'},
+{t:'Esie, My Bestie', f:'/Esie,%20My%20Bestie.mp3'},
+{t:'For the Rest of My Life', f:'/For%20the%20Rest%20of%20My%20Life.mp3'},
+{t:'Holy Spirit Flow', f:'/Holy%20Spirit%20Flow.mp3'},
+{t:'Moonlight Counted Tears', f:'/Moonlight%20Counted%20Tears.mp3'},
+{t:'Reza Towers Again', f:'/Reza%20Towers%20Again.mp3'},
+{t:'Reza Towers', f:'/Reza%20Towers.mp3'},
+{t:'Steve Vibes', f:'/Steve%20Vibes.mp3'},
+{t:'SteveWiizy GenZ', f:'/SteveWiizy%20GenZ.mp3'},
+{t:'SteveWiizy GenZ2', f:'/SteveWiizy%20Genz2.mp3'}
+].map(s=>(
+<div key={s.t} style={{background:'#121212',border:'1px solid #222',borderRadius:'16px',padding:'14px',marginBottom:'12px'}}>
+<p style={{fontWeight:'700',margin:'0 0 8px',color:'#fff'}}>🎵 {s.t}</p>
+<audio controls src={s.f} style={{width:'100%'}} preload="none"></audio>
 </div>
-</section>
+))}
 
 <section id="order" style={{padding:'20px 16px'}}>
 <div style={{background:'#ff0a3b',borderRadius:'20px',padding:'20px',textAlign:'center'}}><h3>Have a story, occasion or idea?</h3><p>Let's turn it into a song.</p></div>
