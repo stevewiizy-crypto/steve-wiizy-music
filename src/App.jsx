@@ -18,9 +18,9 @@ const [likes,setLikes]=useState({});
 const [favs,setFavs]=useState({});
 const [cmts,setCmts]=useState({});
 const [inputs,setInputs]=useState({});
-const [form,setForm]=useState({name:'',story:'',style:'Love Song',occasion:'Birthday',budget:'50000',deadline:'3 days'});
+const [form,setForm]=useState({name:'',story:'',style:'Love Song',occasion:'Birthday',budget:'10000',deadline:'3 days'});
 const filtered = nav==='All' ? SONGS : SONGS.filter(s=>s.cat===nav);
-const waMsg = `Hi Steve Wiizy! I want custom song:%0AName: ${form.name}%0AStyle: ${form.style}%0AOccasion: ${form.occasion}%0ABudget: UGX ${form.budget} (negotiable)%0ADeadline: ${form.deadline}%0AStory: ${form.story}`;
+const waMsg = `Hi Steve Wiizy! I want custom song:%0AName: ${form.name}%0AStyle: ${form.style}%0AOccasion: ${form.occasion}%0ABudget: UGX ${form.budget} (negotiable from 10k)%0ADeadline: ${form.deadline}%0AStory: ${form.story}`;
 return (
 <div style={{background:'#070708',color:'#fff',minHeight:'100vh',fontFamily:'system-ui'}}>
 <nav style={{position:'sticky',top:0,background:'#000',padding:'12px',display:'flex',justifyContent:'space-between',zIndex:20,borderBottom:'1px solid #222'}}>
@@ -30,12 +30,12 @@ return (
 <section id="home" style={{padding:'50px 20px',textAlign:'center'}}>
 <div style={{width:'92px',height:'92px',background:'linear-gradient(135deg,#ff0a3b,#ffb700)',borderRadius:'50%',margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'34px',fontWeight:900}}>SW</div>
 <h1 style={{color:'#ff0a3b',fontSize:'38px',margin:0}}>STEVE WIIZY</h1>
-<p style={{color:'#aaa',fontSize:'13px'}}>Artist • Songwriter • Producer | Kampala</p>
+<p style={{color:'#aaa',fontSize:'13px'}}>Artist • Songwriter • Producer | Kampala, Uganda</p>
 <h2 style={{marginTop:'16px'}}>Your Story. Your Vibe. Your Song.</h2>
-<p style={{color:'#777',maxWidth:'560px',margin:'10px auto',fontSize:'13px'}}>Free to browse. Payment ONLY for custom orders - negotiable for students & small budgets.</p>
+<p style={{color:'#777',maxWidth:'560px',margin:'10px auto',fontSize:'13px'}}>Download 10 latest songs FREE. Custom songs from 10k UGX - negotiable for students!</p>
 </section>
 <section id="music" style={{padding:'20px'}}>
-<h3 style={{textAlign:'center'}}>Your 10 Latest Tracks 🔥</h3>
+<h3 style={{textAlign:'center'}}>10 Latest Tracks 🔥 - Free Download</h3>
 <div style={{display:'flex',gap:'7px',flexWrap:'wrap',justifyContent:'center',marginBottom:'16px'}}>
 {['All','Love','Birthday','Gospel','GenZ','Motivation','Vibe','Dedicated'].map(c=><button key={c} onClick={()=>setNav(c)} style={{background:nav===c?'#ff0a3b':'#151515',color:'#fff',border:'1px solid #333',padding:'7px 14px',borderRadius:'20px',fontSize:'11px'}}>{c}</button>)}
 </div>
@@ -64,25 +64,25 @@ return (
 </div>
 </section>
 <section id="order" style={{padding:'30px 16px',maxWidth:'620px',margin:'0 auto'}}>
-<h2 style={{textAlign:'center'}}>Order Custom Song 🎤 - Negotiable!</h2>
-<p style={{textAlign:'center',color:'#888',fontSize:'12px'}}>Small payments welcome! Students discount!</p>
+<h2 style={{textAlign:'center'}}>Order Custom Song 🎤 From 10k!</h2>
+<p style={{textAlign:'center',color:'#90EE90',fontSize:'12px',fontWeight:'700'}}>Starting at 10,000 UGX - Students welcome! Negotiable!</p>
 <div style={{background:'#111',border:'1px solid #222',borderRadius:'18px',padding:'16px',marginTop:'16px',display:'grid',gap:'12px'}}>
 <input placeholder="Your Name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} style={{background:'#000',border:'1px solid #333',color:'#fff',padding:'13px',borderRadius:'12px'}}/>
-<textarea placeholder="Describe your story / who it's for..." value={form.story} onChange={e=>setForm({...form,story:e.target.value})} rows="3" style={{background:'#000',border:'1px solid #333',color:'#fff',padding:'13px',borderRadius:'12px'}}/>
+<textarea placeholder="Your story..." value={form.story} onChange={e=>setForm({...form,story:e.target.value})} rows="3" style={{background:'#000',border:'1px solid #333',color:'#fff',padding:'13px',borderRadius:'12px'}}/>
 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
 <select value={form.style} onChange={e=>setForm({...form,style:e.target.value})} style={{background:'#000',color:'#fff',border:'1px solid #333',padding:'12px',borderRadius:'10px'}}><option>Love Song</option><option>Birthday</option><option>Gospel</option><option>GenZ / Rap</option><option>School</option><option>Dedicated</option></select>
 <select value={form.occasion} onChange={e=>setForm({...form,occasion:e.target.value})} style={{background:'#000',color:'#fff',border:'1px solid #333',padding:'12px',borderRadius:'10px'}}><option>Birthday</option><option>Love</option><option>Appreciation</option><option>Graduation</option><option>Business</option><option>Just Vibes</option></select>
 </div>
-<div style={{background:'#000',padding:'12px',borderRadius:'12px'}}><label style={{fontSize:'11px'}}>Budget UGX (negotiable)</label><input type="range" min="20000" max="500000" step="5000" value={form.budget} onChange={e=>setForm({...form,budget:e.target.value})} style={{width:'100%',accentColor:'#90EE90'}}/><div style={{color:'#90EE90',fontWeight:'800',fontSize:'12px'}}>UGX {form.budget} - negotiable!</div></div>
-<select value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})} style={{background:'#000',color:'#fff',border:'1px solid #333',padding:'12px',borderRadius:'10px'}}><option>24 hours</option><option>3 days</option><option>1 week</option><option>Flexible</option></select>
-<div style={{fontSize:'11px',color:'#aaa',background:'#000',padding:'12px',borderRadius:'12px',border:'1px dashed #333'}}><b>Admission:</b> 20% deposit to start. Balance after preview. No song = full refund. Students discount - we negotiate!</div>
-<a href={`https://wa.me/${W1}?text=${waMsg}`} style={{background:'#25D366',color:'#fff',padding:'15px',borderRadius:'14px',textAlign:'center',textDecoration:'none',fontWeight:'800'}}>💬 Negotiate & Order on WhatsApp</a>
+<div style={{background:'#000',padding:'12px',borderRadius:'12px',border:'1px solid #222'}}><label style={{fontSize:'11px',color:'#aaa'}}>Budget - From 10k UGX (slide to negotiate)</label><input type="range" min="10000" max="500000" step="5000" value={form.budget} onChange={e=>setForm({...form,budget:e.target.value})} style={{width:'100%',accentColor:'#90EE90'}}/><div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#666',fontSize:'10px'}}>10k Min</span><span style={{color:'#90EE90',fontWeight:'800',fontSize:'13px'}}>UGX {form.budget}</span><span style={{color:'#666',fontSize:'10px'}}>500k Premium</span></div></div>
+<select value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})} style={{background:'#000',color:'#fff',border:'1px solid #333',padding:'12px',borderRadius:'10px'}}><option>24 hours (Express)</option><option>3 days</option><option>1 week</option><option>Flexible</option></select>
+<div style={{fontSize:'11px',color:'#aaa',background:'#000',padding:'12px',borderRadius:'12px',border:'1px dashed #333'}}><b style={{color:'#90EE90'}}>💚 From 10,000 UGX Only!</b><br/>- 20% deposit to start (2k if 10k budget)<br/>- Balance after preview<br/>- No song = full refund<br/>- Students & low budget = we negotiate on WhatsApp!</div>
+<a href={`https://wa.me/${W1}?text=${waMsg}`} style={{background:'#25D366',color:'#fff',padding:'15px',borderRadius:'14px',textAlign:'center',textDecoration:'none',fontWeight:'800'}}>💬 Negotiate from 10k on WhatsApp</a>
 <a href={`https://wa.me/${W2}?text=${waMsg}`} style={{background:'#fff',color:'#000',padding:'15px',borderRadius:'14px',textAlign:'center',textDecoration:'none',fontWeight:'800'}}>WhatsApp 2</a>
 </div>
 </section>
 <section style={{padding:'20px',textAlign:'center',color:'#666',fontSize:'11px'}}>
-<p>© 2026 Steve Wiizy Music - Kampala | Upload profile.jpg to public folder for your photo</p>
+<p>© 2026 Steve Wiizy Music - Kampala | Search on Google: Steve Wiizy Music</p>
 </section>
 </div>
 )
-}
+  }
