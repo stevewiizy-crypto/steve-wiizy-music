@@ -1,89 +1,109 @@
-import { useState } from 'react'
-const W1="256743911998"; const W2="256704536";
+import { useState, useRef, useEffect } from 'react';
+
+const W1="256743911998";
+const W2="2567045";
+
 const SONGS=[
-{t:'Endless Love Swing', f:'/Endless%20Love%20Swing.mp3', cat:'Love', emo:'❤️'},
-{t:'Esie, My Bestie', f:'/Esie,%20My%20Bestie.mp3', cat:'Birthday', emo:'🎂'},
-{t:'For the Rest of My Life', f:'/For%20the%20Rest%20of%20My%20Life.mp3', cat:'Dedicated', emo:'🎤'},
-{t:'Holy Spirit Flow', f:'/Holy%20Spirit%20Flow.mp3', cat:'Gospel', emo:'🙏'},
-{t:'Moonlight Counted Tears', f:'/Moonlight%20Counted%20Tears.mp3', cat:'Love', emo:'🌙'},
-{t:'Reza Towers Again', f:'/Reza%20Towers%20Again.mp3', cat:'Motivation', emo:'🏢'},
-{t:'Reza Towers', f:'/Reza%20Towers.mp3', cat:'Motivation', emo:'🎓'},
-{t:'Steve Vibes', f:'/Steve%20Vibes.mp3', cat:'Vibe', emo:'🎵'},
-{t:'SteveWiizy GenZ', f:'/SteveWiizy%20GenZ.mp3', cat:'GenZ', emo:'🔥'},
-{t:'SteveWiizy GenZ2', f:'/SteveWiizy%20Genz2.mp3', cat:'GenZ', emo:'💿'},
+{t:'Endless Love Swing', f:'/Endless%20Love%20Swing.mp3', cat:'Love'},
+{t:'Esie, My Bestie', f:'/Esie,%20My%20Bestie.mp3', cat:'Love'},
+{t:'For the Rest of My Life', f:'/For%20the%20Rest%20of%20My%20Life.mp3', cat:'Dedicated'},
+{t:'Holy Spirit Flow', f:'/Holy%20Spirit%20Flow.mp3', cat:'Gospel'},
+{t:'Moonlight Counted Tears', f:'/Moonlight%20Counted%20Tears.mp3', cat:'Love'},
+{t:'Reza Towers Again', f:'/Reza%20Towers%20Again.mp3', cat:'Vibe'},
+{t:'Reza Towers', f:'/Reza%20Towers.mp3', cat:'Vibe'},
+{t:'Steve Vibes', f:'/Steve%20Vibes.mp3', cat:'Vibe'},
+{t:'SteveWiizy GenZ', f:'/SteveWiizy%20GenZ.mp3', cat:'GenZ'},
+{t:'SteveWiizy GenZ2', f:'/SteveWiizy%20GenZ2.mp3', cat:'GenZ'},
 ];
-evxport default function App(){
-const [nav,setNav]=useState('All');
-const [likes,setLikes]=useState({});
-const [favs,setFavs]=useState({});
-const [cmts,setCmts]=useState({});
-const [inputs,setInputs]=useState({});
-const [form,setForm]=useState({name:'',story:'',style:'Love Song',occasion:'Birthday',budget:'10000',deadline:'3 days'});
-const filtered = nav==='All' ? SONGS : SONGS.filter(s=>s.cat===nav);
-const waMsg = `Hi Steve Wiizy! I want custom song:%0AName: ${form.name}%0AStyle: ${form.style}%0AOccasion: ${form.occasion}%0ABudget: UGX ${form.budget} (negotiable from 10k)%0ADeadline: ${form.deadline}%0AStory: ${form.story}`;
-rethurn (
-<div style={{background:'#070708',color:'#fff',minHeight:'100vh',fontFamily:'system-ui'}}>
-<nav style={{position:'sticky',top:0,background:'#000',padding:'12px',display:'flex',justifyContent:'space-between',zIndex:20,borderBottom:'1px solid #222'}}>
-<div style={{fontWeight:900}}><span style={{color:'#ff0a3b'}}>STEVE</span> WIIZY</div>
-<div style={{display:'flex',gap:'6px'}}>{['home','music','order','contact'].map(t=><button key={t} onClick={()=>document.getElementById(t)?.scrollIntoView({behavior:'smooth'})} style={{background:'#1a1a1a',color:'#fff',border:'none',padding:'7px 12px',borderRadius:'20px',fontSize:'11px'}}>{t}</button>)}</div>
-</nav>
-<section id="home" style={{padding:'50px 20px',textAlign:'center'}}>
-<div style={{width:'92px',height:'92px',background:'linear-gradient(135deg,#ff0a3b,#ffb700)',borderRadius:'50%',margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'34px',fontWeight:900}}>SW</div>
-<h1 style={{color:'#ff0a3b',fontSize:'38px',margin:0}}>STEVE WIIZY</h1>
-<p style={{color:'#aaa',fontSize:'13px'}}>Artist • Songwriter • Producer | Kampala, Uganda</p>
-<h2 style={{marginTop:'16px'}}>Your Story. Your Vibe. Your Song.</h2>
-<p style={{color:'#777',maxWidth:'560px',margin:'10px auto',fontSize:'13px'}}>Download 10 latest songs FREE. Custom songs from 10k UGX - negotiable for students!</p>
-</section>
-<section id="music" style={{padding:'20px'}}>
-<h3 style={{textAlign:'center'}}>10 Latest Tracks 🔥 - Free Download</h3>
-<div style={{display:'flex',gap:'7px',flexWrap:'wrap',justifyContent:'center',marginBottom:'16px'}}>
-{['All','Love','Birthday','Gospel','GenZ','Motivation','Vibe','Dedicated'].map(c=><button key={c} onClick={()=>setNav(c)} style={{background:nav===c?'#ff0a3b':'#151515',color:'#fff',border:'1px solid #333',padding:'7px 14px',borderRadius:'20px',fontSize:'11px'}}>{c}</button>)}
-</div>
-<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',maxWidth:'900px',margin:'0 auto'}}>
-{filtered.map(s=>(
-<div key={s.t} style={{background:'#111',border:'1px solid #222',borderRadius:'14px',padding:'11px'}}>
-<p style={{fontWeight:'700',margin:'0',fontSize:'12px'}}>{s.emo} {s.t}</p>
-<p style={{fontSize:'9px',color:'#ff0a3b'}}>{s.cat}</p>
-<audio controls src={s.f} style={{width:'100%',height:'32px',margin:'6px 0'}} preload="none"></audio>
-<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px',margin:'8px 0'}}>
-<a href={s.f} download={s.t} style={{background:'#90EE90',color:'#000',padding:'8px',borderRadius:'10px',fontSize:'11px',fontWeight:'800',textAlign:'center',textDecoration:'none',border:'1px solid #4CAF50'}}>⬇️ DOWNLOAD</a>
-<a href={`https://wa.me/${W1}?text=Hi, I want ${s.t}`} style={{background:'#fff',color:'#000',padding:'8px',borderRadius:'10px',fontSize:'11px',fontWeight:'800',textAlign:'center',textDecoration:'none'}}>💬 Order Similar</a>
-</div>
-<div style={{display:'flex',gap:'10px',fontSize:'13px'}}>
-<span onClick={()=>setLikes(p=>({...p,[s.t]:(p[s.t]||0)+1}))} style={{cursor:'pointer'}}>❤️ {likes[s.t]||0}</span>
-<span onClick={()=>setFavs(p=>({...p,[s.t]:!p[s.t]}))} style={{cursor:'pointer'}}>{favs[s.t]?'⭐ Saved':'☆ Save'}</span>
-<span onClick={()=>{navigator.clipboard.writeText(window.location.href)}} style={{cursor:'pointer'}}>↗️ Share</span>
-</div>
-<div style={{marginTop:'8px',display:'flex',gap:'4px'}}>
-<input value={inputs[s.t]||''} onChange={e=>setInputs(p=>({...p,[s.t]:e.target.value}))} placeholder="Comment..." style={{flex:1,background:'#000',border:'1px solid #333',color:'#fff',padding:'6px 8px',borderRadius:'8px',fontSize:'11px'}}/>
-<button onClick={()=>{if(!inputs[s.t])return; setCmts(p=>({...p,[s.t]:[...(p[s.t]||[]),inputs[s.t]]})); setInputs(q=>({...q,[s.t]:''}))}} style={{background:'#222',border:'none',color:'#fff',padding:'6px 12px',borderRadius:'8px',fontSize:'11px'}}>Post</button>
-</div>
-<div style={{fontSize:'10px',color:'#aaa',marginTop:'6px'}}>{(cmts[s.t]||[]).map((c,i)=><div key={i}>💬 {c}</div>)}</div>
-</div>
-))}
-</div>
-</section>
-<section id="order" style={{padding:'30px 16px',maxWidth:'620px',margin:'0 auto'}}>
-<h2 style={{textAlign:'center'}}>Order Custom Song 🎤 From 10k!</h2>
-<p style={{textAlign:'center',color:'#90EE90',fontSize:'12px',fontWeight:'700'}}>Starting at 10,000 UGX - Students welcome! Negotiable!</p>
-<div style={{background:'#111',border:'1px solid #222',borderRadius:'18px',padding:'16px',marginTop:'16px',display:'grid',gap:'12px'}}>
-<input placeholder="Your Name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} style={{background:'#000',border:'1px solid #333',color:'#fff',padding:'13px',borderRadius:'12px'}}/>
-<textarea placeholder="Your story..." value={form.story} onChange={e=>setForm({...form,story:e.target.value})} rows="3" style={{background:'#000',border:'1px solid #333',color:'#fff',padding:'13px',borderRadius:'12px'}}/>
-<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
-<select value={form.style} onChange={e=>setForm({...form,style:e.target.value})} style={{background:'#000',color:'#fff',border:'1px solid #333',padding:'12px',borderRadius:'10px'}}><option>Love Song</option><option>Birthday</option><option>Gospel</option><option>GenZ / Rap</option><option>School</option><option>Dedicated</option></select>
-<select value={form.occasion} onChange={e=>setForm({...form,occasion:e.target.value})} style={{background:'#000',color:'#fff',border:'1px solid #333',padding:'12px',borderRadius:'10px'}}><option>Birthday</option><option>Love</option><option>Appreciation</option><option>Graduation</option><option>Business</option><option>Just Vibes</option></select>
-</div>
-<div style={{background:'#000',padding:'12px',borderRadius:'12px',border:'1px solid #222'}}><label style={{fontSize:'11px',color:'#aaa'}}>Budget - From 10k UGX (slide to negotiate)</label><input type="range" min="10000" max="500000" step="5000" value={form.budget} onChange={e=>setForm({...form,budget:e.target.value})} style={{width:'100%',accentColor:'#90EE90'}}/><div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#666',fontSize:'10px'}}>10k Min</span><span style={{color:'#90EE90',fontWeight:'800',fontSize:'13px'}}>UGX {form.budget}</span><span style={{color:'#666',fontSize:'10px'}}>500k Premium</span></div></div>
-<select value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})} style={{background:'#000',color:'#fff',border:'1px solid #333',padding:'12px',borderRadius:'10px'}}><option>24 hours (Express)</option><option>3 days</option><option>1 week</option><option>Flexible</option></select>
-<div style={{fontSize:'11px',color:'#aaa',background:'#000',padding:'12px',borderRadius:'12px',border:'1px dashed #333'}}><b style={{color:'#90EE90'}}>💚 From 10,000 UGX Only!</b><br/>- 20% deposit to start (2k if 10k budget)<br/>- Balance after preview<br/>- No song = full refund<br/>- Students & low budget = we negotiate on WhatsApp!</div>
-<a href={`https://wa.me/${W1}?text=${waMsg}`} style={{background:'#25D366',color:'#fff',padding:'15px',borderRadius:'14px',textAlign:'center',textDecoration:'none',fontWeight:'800'}}>💬 Negotiate from 10k on WhatsApp</a>
-<a href={`https://wa.me/${W2}?text=${waMsg}`} style={{background:'#fff',color:'#000',padding:'15px',borderRadius:'14px',textAlign:'center',textDecoration:'none',fontWeight:'800'}}>WhatsApp 2</a>
-</div>
-</section>
-<section style={{padding:'20px',textAlign:'center',color:'#666',fontSize:'11px'}}>
-<p>© 2026 Steve Wiizy Music - Kampala | Search on Google: Steve Wiizy Music</p>
-</section>
-</div>
-)
+
+const CATS = ["All","Love","Birthday","Gospel","GenZ","Motivation","Vibe","Dedicated"];
+
+export default function App(){
+  const [search, setSearch] = useState("");
+  const [activeCat, setActiveCat] = useState("All");
+  const [current, setCurrent] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [likes, setLikes] = useState(()=> JSON.parse(localStorage.getItem('likes')||'{}'));
+  const [likedByMe, setLikedByMe] = useState(()=> JSON.parse(localStorage.getItem('likedByMe')||'[]'));
+  const audioRef = useRef(null);
+
+  const filtered = SONGS.filter(s => {
+    const matchSearch = s.t.toLowerCase().includes(search.toLowerCase());
+    const matchCat = activeCat==="All" || s.cat===activeCat;
+    return matchSearch && matchCat;
+  });
+
+  useEffect(()=>{
+    if(current && audioRef.current){
+      audioRef.current.src = current.f;
+      audioRef.current.play().then(()=>setIsPlaying(true)).catch(()=>{});
+    }
+  },[current]);
+
+  const togglePlay = (song)=>{
+    if(current?.t===song.t){
+      if(isPlaying){ audioRef.current.pause(); setIsPlaying(false); }
+      else{ audioRef.current.play(); setIsPlaying(true); }
+    } else { setCurrent(song); }
+  };
+
+  const handleLike = (t)=>{
+    if(likedByMe.includes(t)) return;
+    const newLikes = {...likes, [t]:(likes[t]||0)+1};
+    const newMe = [...likedByMe, t];
+    setLikes(newLikes); setLikedByMe(newMe);
+    localStorage.setItem('likes', JSON.stringify(newLikes));
+    localStorage.setItem('likedByMe', JSON.stringify(newMe));
+  };
+
+  return(
+    <div className="min-h-screen bg-black text-white p-4 pb-28">
+      <div className="text-center py-4">
+        <h1 className="text-4xl font-black text-red-500">STEVE WIIZY</h1>
+        <p className="text-zinc-400 text-sm">Artist • Songwriter • Producer | Kampala, Uganda</p>
+        <p className="text-xl font-bold mt-4">Your Story. Your Vibe. Your Song.</p>
+        <p className="text-zinc-500 text-sm">Download 10 latest songs FREE. Custom songs from 10k UGX - negotiable for students!</p>
+      </div>
+
+      <div className="max-w-md mx-auto mt-4">
+        <input type="text" placeholder="🔍 Search songs..." value={search} onChange={e=>setSearch(e.target.value)} className="w-full p-3 rounded-full bg-zinc-800 text-white outline-none border border-zinc-700" />
+      </div>
+
+      <h2 className="text-xl font-bold mt-6 mb-3">10 Latest Tracks 🔥 - Free Download</h2>
+
+      <div className="flex flex-wrap gap-2 mb-6">
+        {CATS.map(c=>(
+          <button key={c} onClick={()=>setActiveCat(c)} className={`px-4 py-1.5 rounded-full text-sm ${activeCat===c?'bg-red-600 text-white':'bg-zinc-800 text-zinc-300'}`}>{c}</button>
+        ))}
+      </div>
+
+      <div className="grid gap-4 max-w-md mx-auto">
+        {filtered.map((song, i)=>(
+          <div key={i} className="bg-zinc-900 p-4 rounded-2xl border border-zinc-800">
+            <p className="font-bold text-center">❤️ {song.t}</p>
+            <p className="text-red-500 text-xs text-center mb-3">{song.cat}</p>
+            <div className="flex justify-between items-center bg-zinc-800 rounded-full px-3 py-2 mb-3">
+              <button onClick={()=>togglePlay(song)} className="text-lg">{current?.t===song.t && isPlaying? "⏸️" : "▶️"} {audioRef.current? `${Math.floor(audioRef.current?.currentTime||0)}s` : "0:00"}</button>
+              <span className="text-xs">{current?.t===song.t && isPlaying? "Playing..." : "Tap play"}</span>
+            </div>
+            <div className="flex gap-2 mb-3">
+              <a href={song.f} download className="flex-1 bg-green-400 text-black text-center py-2 rounded-xl font-bold text-sm">⬇️ DOWNLOAD</a>
+              <a href={`https://wa.me/${W1}?text=Hi Steve, I want a song like ${song.t}`} className="flex-1 bg-white text-black text-center py-2 rounded-xl font-bold text-sm">💬 Order Similar</a>
+            </div>
+            <div className="flex gap-3 text-sm items-center">
+              <button onClick={()=>handleLike(song.t)} className="flex items-center gap-1">❤️ {likes[song.t]||0}</button>
+              <span>☆ Save</span>
+              <span>↗️ Share</span>
+            </div>
+            <div className="flex gap-2 mt-3">
+              <input placeholder="Comment..." className="flex-1 bg-black border border-zinc-700 rounded-full px-3 py-1.5 text-sm" />
+              <button className="bg-zinc-700 px-4 py-1.5 rounded-full text-sm">Post</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <audio ref={audioRef} onEnded={()=>setIsPlaying(false)} onTimeUpdate={()=>{}} />
+    </div>
+  );
   }
-  
