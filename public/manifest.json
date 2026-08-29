@@ -9,8 +9,9 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192x192.png/ff0a3b/ffffff?text=SW",
-      "sizes": "192x192",
+  "src": "/IMG-20260829-WA2499.jpg",
+"sizes": "192x192",
+"type": "image/jpeg",
       "type": "image/png",
       "purpose": "any maskable"
     },
