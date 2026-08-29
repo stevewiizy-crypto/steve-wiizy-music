@@ -12,7 +12,7 @@ const SONGS=[
 {t:'SteveWiizy GenZ', f:'/SteveWiizy%20GenZ.mp3', cat:'GenZ', emo:'🔥'},
 {t:'SteveWiizy GenZ2', f:'/SteveWiizy%20Genz2.mp3', cat:'GenZ', emo:'💿'},
 ];
-export default function App(){
+evxport default function App(){
 const [nav,setNav]=useState('All');
 const [likes,setLikes]=useState({});
 const [favs,setFavs]=useState({});
@@ -21,7 +21,7 @@ const [inputs,setInputs]=useState({});
 const [form,setForm]=useState({name:'',story:'',style:'Love Song',occasion:'Birthday',budget:'10000',deadline:'3 days'});
 const filtered = nav==='All' ? SONGS : SONGS.filter(s=>s.cat===nav);
 const waMsg = `Hi Steve Wiizy! I want custom song:%0AName: ${form.name}%0AStyle: ${form.style}%0AOccasion: ${form.occasion}%0ABudget: UGX ${form.budget} (negotiable from 10k)%0ADeadline: ${form.deadline}%0AStory: ${form.story}`;
-return (
+rethurn (
 <div style={{background:'#070708',color:'#fff',minHeight:'100vh',fontFamily:'system-ui'}}>
 <nav style={{position:'sticky',top:0,background:'#000',padding:'12px',display:'flex',justifyContent:'space-between',zIndex:20,borderBottom:'1px solid #222'}}>
 <div style={{fontWeight:900}}><span style={{color:'#ff0a3b'}}>STEVE</span> WIIZY</div>
@@ -86,3 +86,4 @@ return (
 </div>
 )
   }
+  
