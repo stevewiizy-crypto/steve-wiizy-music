@@ -1,7 +1,7 @@
 {
   "name": "Steve Wiizy Music - Official App",
   "short_name": "Steve Wiizy",
-  "description": "Download 10 latest songs FREE, order custom songs from 10k UGX - Kampala Artist",
+  "description": "Download 10 latest songs FREE",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070708",
@@ -9,16 +9,15 @@
   "orientation": "portrait",
   "icons": [
     {
-  "src": "/IMG-20260829-WA2499.jpg",
-"sizes": "192x192",
-"type": "image/jpeg",
-      "type": "image/png",
+      "src": "/IMG-20260829-WA2499.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "https://via.placeholder.com/512x512.png/ff0a3b/ffffff?text=SW",
+      "src": "/IMG-20260829-WA2499.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }
