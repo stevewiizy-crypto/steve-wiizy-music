@@ -1,122 +1,49 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+const W1="256743911998"; const W2="256763012851";
+export default function App(){
+const [nav,setNav]=useState('home');
+return (
+<div style={{background:'#070708',color:'#fff',minHeight:'100vh',fontFamily:'system-ui'}}>
+<nav style={{position:'sticky',top:0,background:'#070708',borderBottom:'1px solid #222',padding:'14px',display:'flex',justifyContent:'space-between'}}>
+<div style={{fontWeight:800}}><span style={{color:'#ff0a3b'}}>STEVE WIIZY</span> MUSIC</div>
+<div style={{display:'flex',gap:'8px'}}>
+{['home','music','order','contact'].map(id=><button key={id} onClick={()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'})} style={{background:'#1a1a1a',border:'1px solid #222',color:'#fff',padding:'6px 12px',borderRadius:'20px',fontSize:'12px'}}>{id}</button>)}
+</div>
+</nav>
 
-function App() {
-  const [count, setCount] = useState(0)
+<section id="home" style={{padding:'60px 20px',textAlign:'center'}}>
+<h1 style={{color:'#ff0a3b',fontSize:'42px',margin:0}}>STEVE WIIZY<br/><span style={{fontSize:'14px',letterSpacing:'8px',color:'#fff'}}>MUSIC</span></h1>
+<h2>Your Story. Your Vibe. Your Song.</h2>
+<p style={{color:'#aaa',maxWidth:'600px',margin:'10px auto'}}>A creative music space where stories, emotions, celebrations and ideas are turned into memorable songs. Free to browse. Payment ONLY for custom orders.</p>
+<button onClick={()=>document.getElementById('order')?.scrollIntoView({behavior:'smooth'})} style={{background:'#ff0a3b',border:'none',color:'#fff',padding:'14px 24px',borderRadius:'100px',fontWeight:800}}>Create My Song</button>
+</section>
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+<section id="music" style={{padding:'20px 16px'}}>
+<h3>Music Categories • All, Dedication, Love, Birthday, Appreciation, School, Motivation</h3>
+<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'12px',marginTop:'12px'}}>
+{[{t:'Your Story Anthem',c:'🎤'},{t:'Birthday For Bestie',c:'🎂'},{t:'Thank You Mama',c:'❤️'},{t:'My School Pride',c:'🎓'},{t:'Love Letter',c:'💌'},{t:'Hustle Motivation',c:'🔥'}].map((s,i)=><div key={i} style={{background:'#121212',border:'1px solid #222',borderRadius:'16px',padding:'16px',textAlign:'center'}}><div style={{fontSize:'32px'}}>{s.c}</div><div style={{fontWeight:700,fontSize:'13px',marginTop:'8px'}}>{s.t}</div><div style={{display:'flex',gap:'6px',justifyContent:'center',marginTop:'8px'}}><span>❤️</span><span>⭐</span><span>↗️</span><span>⬇️</span></div></div>)}
+</div>
+</section>
 
-      <div className="ticks"></div>
+<section id="order" style={{padding:'20px 16px'}}>
+<div style={{background:'#ff0a3b',borderRadius:'20px',padding:'20px',textAlign:'center'}}><h3>Have a story, occasion or idea?</h3><p>Let's turn it into a song.</p></div>
+<div style={{background:'#121212',border:'1px solid #222',borderRadius:'16px',padding:'16px',marginTop:'12px',display:'grid',gap:'10px',maxWidth:'600px',margin:'12px auto'}}>
+<input placeholder="Your Name" style={{background:'#1a1a1a',border:'1px solid #222',color:'#fff',padding:'12px',borderRadius:'10px'}}/>
+<input placeholder="WhatsApp" style={{background:'#1a1a1a',border:'1px solid #222',color:'#fff',padding:'12px',borderRadius:'10px'}}/>
+<textarea placeholder="Your story..." style={{background:'#1a1a1a',border:'1px solid #222',color:'#fff',padding:'12px',borderRadius:'10px',height:'80px'}}/>
+<a href={`https://wa.me/${W1}?text=Hello%20Steve%20Wiizy%20Music%20I%20want%20to%20order%20a%20custom%20song`} target="_blank" style={{background:'#25D366',color:'#fff',padding:'14px',borderRadius:'100px',textAlign:'center',textDecoration:'none',fontWeight:800}}>Send Order via WhatsApp →</a>
+</div>
+</section>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+<section id="contact" style={{padding:'20px 16px 100px',textAlign:'center'}}>
+<div style={{background:'#fff',color:'#000',borderRadius:'16px',padding:'18px',maxWidth:'600px',margin:'0 auto'}}>
+<h3>Steve Wiizy Music</h3>
+<p style={{fontSize:'12px',color:'#666'}}>Custom songs • Inquiries • Collaborations</p>
+<a href={`https://wa.me/${W1}`} style={{display:'block',background:'#000',color:'#fff',padding:'14px',borderRadius:'100px',textDecoration:'none',fontWeight:800,marginTop:'10px'}}>+256 743 911 998</a>
+<a href={`https://wa.me/${W2}`} style={{display:'block',background:'#ff0a3b',color:'#fff',padding:'14px',borderRadius:'100px',textDecoration:'none',fontWeight:800,marginTop:'8px'}}>+256 763 012 851</a>
+</div>
+<p style={{color:'#444',fontSize:'10px',marginTop:'12px'}}>© 2026 Steve Wiizy Music • Kampala</p>
+</section>
+</div>
+)
 }
-
-export default App
