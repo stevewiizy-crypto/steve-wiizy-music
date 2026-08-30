@@ -105,13 +105,6 @@ export default function App() {
     return categoryMatch && searchMatch;
   });
 
-  /*
-   * SINGLE AUDIO PLAYER
-   *
-   * Only one audio element exists on the whole page.
-   * Selecting another song changes this player's source.
-   * Therefore two songs cannot play simultaneously.
-   */
   useEffect(() => {
     if (!currentSong || !audioRef.current) return;
 
@@ -154,15 +147,16 @@ export default function App() {
     setIsPlaying(true);
   };
 
-  const toggleLike = (songId) => {
-    setLikes((previous) => ({
-      ...previous,
-      [songId]: (previous[songId] || 0) + 1,
+  const toggleLike = (id) => {
+    setLikes((old) => ({
+      ...old,
+      [id]: (old[id] || 0) + 1,
     }));
   };
 
   const orderSimilar = (song) => {
-    const message = `Hi Steve, I want a song similar to "${song.title}".`;
+    const message =
+      `Hi Steve, I want a song similar to "${song.title}".`;
 
     window.open(
       `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`,
@@ -181,27 +175,24 @@ export default function App() {
   };
 
   const shareSong = async (song) => {
-    const shareText = `🎵 ${song.title} by Steve Wiizy`;
+    const text = `🎵 ${song.title} by Steve Wiizy`;
 
     if (navigator.share) {
       try {
         await navigator.share({
           title: song.title,
-          text: shareText,
+          text,
           url: window.location.href,
         });
-      } catch {
-        // Sharing cancelled
-      }
+      } catch {}
     } else {
       try {
         await navigator.clipboard.writeText(
-          `${shareText} - ${window.location.href}`
+          `${text} ${window.location.href}`
         );
-
         alert("Song link copied!");
       } catch {
-        alert("Copying the link is not supported on this browser.");
+        alert("Unable to copy the link.");
       }
     }
   };
@@ -223,207 +214,913 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <>
+      <style>{`
 
-      {/* ================= HEADER ================= */}
+        * {
+          box-sizing: border-box;
+        }
 
-      <header className="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-zinc-900">
-        <div className="max-w-6xl mx-auto px-5 py-4">
+        html {
+          scroll-behavior: smooth;
+        }
 
-          <div className="flex items-center justify-between">
+        body {
+          margin: 0;
+          background: #070709;
+          color: white;
+          font-family:
+            Inter,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        }
+
+        button,
+        input {
+          font: inherit;
+        }
+
+        button,
+        a {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .site {
+          min-height: 100vh;
+          background:
+            radial-gradient(
+              circle at 50% 0%,
+              rgba(220, 20, 60, 0.13),
+              transparent 32%
+            ),
+            #070709;
+          padding-bottom: 120px;
+        }
+
+        /* HEADER */
+
+        .header {
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          background: rgba(7, 7, 9, 0.92);
+          backdrop-filter: blur(18px);
+          border-bottom: 1px solid #202024;
+        }
+
+        .header-inner {
+          max-width: 1150px;
+          margin: auto;
+          padding: 14px 22px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 11px;
+          border: 0;
+          background: none;
+          color: white;
+          cursor: pointer;
+        }
+
+        .brand-logo {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: linear-gradient(
+            135deg,
+            #ffd700,
+            #ff1744,
+            #7c3aed
+          );
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 900;
+          font-size: 15px;
+        }
+
+        .brand-name {
+          font-size: 15px;
+          font-weight: 900;
+          letter-spacing: 1px;
+        }
+
+        .brand-name span {
+          color: #ff1744;
+        }
+
+        .brand-small {
+          color: #777;
+          font-size: 9px;
+          letter-spacing: 2px;
+          margin-top: 2px;
+        }
+
+        .nav {
+          display: flex;
+          align-items: center;
+          gap: 26px;
+        }
+
+        .nav button {
+          border: 0;
+          background: none;
+          color: #aaa;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        .nav button:hover {
+          color: white;
+        }
+
+        .whatsapp-nav {
+          text-decoration: none;
+          background: #25d366;
+          color: #061108 !important;
+          padding: 10px 17px;
+          border-radius: 999px;
+          font-weight: 800;
+        }
+
+        .menu-button {
+          display: none;
+          border: 1px solid #333;
+          background: #111;
+          color: white;
+          border-radius: 10px;
+          width: 42px;
+          height: 42px;
+          font-size: 20px;
+        }
+
+        .mobile-menu {
+          display: none;
+        }
+
+        /* HERO */
+
+        .hero {
+          max-width: 1000px;
+          margin: auto;
+          padding: 85px 22px 75px;
+          text-align: center;
+        }
+
+        .hero-logo {
+          width: 105px;
+          height: 105px;
+          margin: auto;
+          border-radius: 50%;
+          background: linear-gradient(
+            135deg,
+            #ffd700,
+            #ff1744,
+            #7c3aed
+          );
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 31px;
+          font-weight: 900;
+          box-shadow: 0 20px 70px rgba(255, 23, 68, 0.2);
+        }
+
+        .hero-label {
+          color: #ff3358;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 3px;
+          margin-top: 28px;
+        }
+
+        .hero h1 {
+          margin: 12px 0 0;
+          font-size: clamp(42px, 8vw, 78px);
+          line-height: 0.98;
+          letter-spacing: -3px;
+          font-weight: 950;
+        }
+
+        .hero h1 span {
+          color: #ff1744;
+        }
+
+        .hero p {
+          max-width: 650px;
+          margin: 24px auto 0;
+          color: #92929b;
+          line-height: 1.7;
+          font-size: 16px;
+        }
+
+        .hero-actions {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 30px;
+          flex-wrap: wrap;
+        }
+
+        .primary-button,
+        .secondary-button {
+          border: 0;
+          cursor: pointer;
+          padding: 14px 23px;
+          border-radius: 999px;
+          font-weight: 850;
+        }
+
+        .primary-button {
+          background: #ff1744;
+          color: white;
+        }
+
+        .primary-button:hover {
+          background: #e9143d;
+        }
+
+        .secondary-button {
+          background: white;
+          color: #080808;
+        }
+
+        /* MUSIC */
+
+        .music-section {
+          max-width: 1150px;
+          margin: auto;
+          padding: 0 22px;
+        }
+
+        .section-top {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 25px;
+          margin-bottom: 25px;
+        }
+
+        .section-label {
+          color: #ff1744;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 3px;
+        }
+
+        .section-title {
+          margin: 7px 0 0;
+          font-size: 34px;
+          font-weight: 900;
+        }
+
+        .section-subtitle {
+          color: #686870;
+          margin-top: 5px;
+          font-size: 13px;
+        }
+
+        .search {
+          width: 310px;
+          background: #111115;
+          color: white;
+          border: 1px solid #29292f;
+          border-radius: 14px;
+          padding: 14px 17px;
+          outline: none;
+        }
+
+        .search:focus {
+          border-color: #ff1744;
+        }
+
+        .categories {
+          display: flex;
+          gap: 8px;
+          overflow-x: auto;
+          padding: 5px 0 24px;
+          scrollbar-width: none;
+        }
+
+        .categories::-webkit-scrollbar {
+          display: none;
+        }
+
+        .category {
+          white-space: nowrap;
+          border: 1px solid #27272c;
+          background: #101014;
+          color: #8f8f97;
+          padding: 9px 17px;
+          border-radius: 999px;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .category.active {
+          background: #ff1744;
+          border-color: #ff1744;
+          color: white;
+        }
+
+        /* SONG GRID */
+
+        .song-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 17px;
+        }
+
+        .song-card {
+          background: #101014;
+          border: 1px solid #202025;
+          border-radius: 22px;
+          padding: 19px;
+          transition: 0.2s ease;
+        }
+
+        .song-card:hover {
+          border-color: #3b3b43;
+          transform: translateY(-2px);
+        }
+
+        .song-card.active {
+          border-color: #ff1744;
+          background: #141014;
+        }
+
+        .song-head {
+          display: flex;
+          align-items: center;
+          gap: 13px;
+        }
+
+        .song-icon {
+          width: 57px;
+          height: 57px;
+          flex-shrink: 0;
+          border-radius: 16px;
+          background: #19191e;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+        }
+
+        .active .song-icon {
+          background: #ff1744;
+        }
+
+        .song-info {
+          min-width: 0;
+          flex: 1;
+        }
+
+        .song-title {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 850;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .song-category {
+          margin-top: 5px;
+          color: #ff4567;
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .play-button {
+          width: 46px;
+          height: 46px;
+          flex-shrink: 0;
+          border: 0;
+          border-radius: 50%;
+          background: white;
+          color: #090909;
+          cursor: pointer;
+          font-size: 17px;
+          font-weight: 900;
+        }
+
+        .play-button:hover {
+          transform: scale(1.06);
+        }
+
+        .now-playing {
+          color: #ff1744;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 1px;
+          margin-top: 13px;
+        }
+
+        .song-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          margin-top: 17px;
+        }
+
+        .download-button,
+        .order-button {
+          text-decoration: none;
+          border: 0;
+          padding: 11px 8px;
+          border-radius: 11px;
+          text-align: center;
+          font-size: 12px;
+          font-weight: 850;
+          cursor: pointer;
+        }
+
+        .download-button {
+          background: #25d366;
+          color: #061108;
+        }
+
+        .order-button {
+          background: white;
+          color: #080808;
+        }
+
+        .song-bottom {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 13px;
+        }
+
+        .small-action {
+          border: 0;
+          background: none;
+          color: #777780;
+          cursor: pointer;
+          font-size: 12px;
+        }
+
+        .small-action:hover {
+          color: white;
+        }
+
+        /* ORDER */
+
+        .order-section {
+          max-width: 850px;
+          margin: 80px auto 0;
+          padding: 0 22px;
+        }
+
+        .order-box {
+          border: 1px solid #29292f;
+          border-radius: 28px;
+          padding: 48px 25px;
+          text-align: center;
+          background:
+            radial-gradient(
+              circle at 50% 0%,
+              rgba(255, 23, 68, 0.12),
+              transparent 50%
+            ),
+            #101014;
+        }
+
+        .order-icon {
+          width: 65px;
+          height: 65px;
+          border-radius: 50%;
+          margin: auto;
+          background: #ff1744;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+        }
+
+        .order-box h2 {
+          margin: 17px 0 0;
+          font-size: 32px;
+        }
+
+        .order-box p {
+          max-width: 580px;
+          margin: 13px auto 0;
+          color: #85858e;
+          line-height: 1.6;
+          font-size: 14px;
+        }
+
+        .price {
+          color: #ffd43b !important;
+          font-size: 19px !important;
+          font-weight: 900;
+          margin-top: 20px !important;
+        }
+
+        .whatsapp-order {
+          display: inline-block;
+          text-decoration: none;
+          background: #25d366;
+          color: #061108;
+          font-weight: 900;
+          padding: 14px 25px;
+          border-radius: 999px;
+          margin-top: 20px;
+        }
+
+        /* PLAYER */
+
+        .player {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 200;
+          background: rgba(10, 10, 12, 0.96);
+          backdrop-filter: blur(20px);
+          border-top: 1px solid #29292f;
+        }
+
+        .player-inner {
+          max-width: 1150px;
+          margin: auto;
+          padding: 11px 22px;
+        }
+
+        .player-top {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .player-icon {
+          width: 43px;
+          height: 43px;
+          flex-shrink: 0;
+          border-radius: 11px;
+          background: #ff1744;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .player-info {
+          min-width: 0;
+          flex: 1;
+        }
+
+        .player-title {
+          font-size: 13px;
+          font-weight: 850;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .player-category {
+          color: #777780;
+          font-size: 10px;
+          margin-top: 3px;
+        }
+
+        .player-toggle {
+          width: 40px;
+          height: 40px;
+          border: 0;
+          border-radius: 50%;
+          background: white;
+          color: black;
+          font-weight: 900;
+        }
+
+        .audio {
+          width: 100%;
+          height: 32px;
+          margin-top: 5px;
+        }
+
+        /* FOOTER */
+
+        .footer {
+          text-align: center;
+          color: #55555c;
+          font-size: 11px;
+          padding: 45px 20px 10px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+          .header-inner {
+            padding: 11px 16px;
+          }
+
+          .nav {
+            display: none;
+          }
+
+          .menu-button {
+            display: block;
+          }
+
+          .mobile-menu {
+            padding: 12px 16px 17px;
+            border-top: 1px solid #202024;
+            flex-direction: column;
+            gap: 8px;
+          }
+
+          .mobile-menu.open {
+            display: flex;
+          }
+
+          .mobile-menu button,
+          .mobile-menu a {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            border: 0;
+            text-align: center;
+            text-decoration: none;
+          }
+
+          .mobile-menu button {
+            background: #151519;
+            color: white;
+          }
+
+          .mobile-menu a {
+            background: #25d366;
+            color: #061108;
+            font-weight: 850;
+          }
+
+          .hero {
+            padding: 55px 17px 55px;
+          }
+
+          .hero-logo {
+            width: 85px;
+            height: 85px;
+            font-size: 26px;
+          }
+
+          .hero h1 {
+            font-size: 46px;
+            letter-spacing: -2px;
+          }
+
+          .hero p {
+            font-size: 14px;
+          }
+
+          .hero-actions {
+            flex-direction: column;
+          }
+
+          .primary-button,
+          .secondary-button {
+            width: 100%;
+          }
+
+          .music-section {
+            padding: 0 15px;
+          }
+
+          .section-top {
+            display: block;
+          }
+
+          .section-title {
+            font-size: 28px;
+          }
+
+          .search {
+            width: 100%;
+            margin-top: 18px;
+          }
+
+          .song-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .song-card {
+            padding: 16px;
+            border-radius: 19px;
+          }
+
+          .order-section {
+            padding: 0 15px;
+            margin-top: 55px;
+          }
+
+          .order-box {
+            padding: 38px 19px;
+          }
+
+          .order-box h2 {
+            font-size: 27px;
+          }
+
+          .player-inner {
+            padding: 9px 12px;
+          }
+
+        }
+
+      `}</style>
+
+      <div className="site">
+
+        {/* HEADER */}
+
+        <header className="header">
+
+          <div className="header-inner">
 
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="flex items-center gap-3"
+              className="brand"
+              onClick={() =>
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                })
+              }
             >
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-yellow-400 via-red-500 to-purple-700 flex items-center justify-center font-black">
+              <div className="brand-logo">
                 SW
               </div>
 
-              <div className="text-left">
-                <p className="font-black tracking-wide">
-                  STEVE <span className="text-red-500">WIIZY</span>
-                </p>
+              <div>
+                <div className="brand-name">
+                  STEVE <span>WIIZY</span>
+                </div>
 
-                <p className="text-[10px] text-zinc-500">
+                <div className="brand-small">
                   MUSIC
-                </p>
+                </div>
               </div>
             </button>
 
-            {/* DESKTOP NAVIGATION */}
+            <nav className="nav">
 
-            <nav className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
-              <button
-                onClick={scrollToMusic}
-                className="hover:text-white transition"
-              >
+              <button onClick={scrollToMusic}>
                 Music
               </button>
 
-              <button
-                onClick={scrollToOrder}
-                className="hover:text-white transition"
-              >
+              <button onClick={scrollToOrder}>
                 Custom Song
               </button>
 
               <a
+                className="whatsapp-nav"
                 href={`https://wa.me/${WHATSAPP}`}
                 target="_blank"
                 rel="noreferrer"
-                className="bg-green-500 text-black px-4 py-2 rounded-full font-bold"
               >
                 WhatsApp
               </a>
+
             </nav>
 
-            {/* MOBILE MENU */}
-
             <button
+              className="menu-button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden text-2xl"
-              aria-label="Open menu"
             >
               {menuOpen ? "✕" : "☰"}
             </button>
 
           </div>
 
-          {menuOpen && (
-            <div className="md:hidden border-t border-zinc-900 mt-4 pt-4 pb-2 flex flex-col gap-3">
+          <div
+            className={`mobile-menu ${
+              menuOpen ? "open" : ""
+            }`}
+          >
 
-              <button
-                onClick={scrollToMusic}
-                className="text-left py-2 text-zinc-300"
-              >
-                🎵 Music
-              </button>
+            <button onClick={scrollToMusic}>
+              🎵 Music
+            </button>
 
-              <button
-                onClick={scrollToOrder}
-                className="text-left py-2 text-zinc-300"
-              >
-                🎤 Custom Song
-              </button>
+            <button onClick={scrollToOrder}>
+              🎤 Custom Song
+            </button>
 
-              <a
-                href={`https://wa.me/${WHATSAPP}`}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-green-500 text-black font-bold text-center py-3 rounded-xl"
-              >
-                💬 WhatsApp Steve
-              </a>
+            <a
+              href={`https://wa.me/${WHATSAPP}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              💬 WhatsApp Steve
+            </a>
 
-            </div>
-          )}
+          </div>
 
-        </div>
-      </header>
+        </header>
 
-      {/* ================= HERO ================= */}
+        {/* HERO */}
 
-      <section className="max-w-6xl mx-auto px-5 pt-12 pb-10">
+        <section className="hero">
 
-        <div className="text-center">
-
-          <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-yellow-400 via-red-500 to-purple-700 flex items-center justify-center text-4xl font-black shadow-2xl">
+          <div className="hero-logo">
             SW
           </div>
 
-          <p className="text-red-500 font-bold text-sm mt-6 tracking-widest">
+          <div className="hero-label">
             STEVE WIIZY MUSIC
-          </p>
+          </div>
 
-          <h1 className="text-4xl md:text-7xl font-black mt-2 leading-tight">
+          <h1>
             Your Story.
             <br />
-            <span className="text-red-500">Your Vibe.</span>
+            <span>Your Vibe.</span>
             <br />
             Your Song.
           </h1>
 
-          <p className="text-zinc-400 max-w-xl mx-auto mt-5">
-            Listen to my music, discover different vibes and
-            order a custom song for your special moment.
+          <p>
+            Listen to my music, discover different vibes
+            and order a custom song for your special
+            moment.
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-3 mt-7">
+          <div className="hero-actions">
 
             <button
+              className="primary-button"
               onClick={scrollToMusic}
-              className="bg-red-600 hover:bg-red-500 px-7 py-4 rounded-full font-black transition"
             >
               🎧 Explore Music
             </button>
 
             <button
+              className="secondary-button"
               onClick={scrollToOrder}
-              className="bg-white hover:bg-zinc-200 text-black px-7 py-4 rounded-full font-black transition"
             >
               🎤 Order Custom Song
             </button>
 
           </div>
 
-        </div>
+        </section>
 
-      </section>
+        {/* MUSIC */}
 
-      {/* ================= MUSIC ================= */}
+        <section
+          id="music"
+          className="music-section"
+        >
 
-      <main
-        id="music"
-        className="max-w-6xl mx-auto px-5 pb-40"
-      >
-
-        <div className="border-t border-zinc-900 pt-10">
-
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+          <div className="section-top">
 
             <div>
-              <p className="text-red-500 text-sm font-bold">
+              <div className="section-label">
                 MY MUSIC
-              </p>
+              </div>
 
-              <h2 className="text-3xl md:text-4xl font-black mt-1">
+              <h2 className="section-title">
                 Latest Tracks 🔥
               </h2>
 
-              <p className="text-zinc-500 text-sm mt-2">
-                {SONGS.length} songs available to listen to.
-              </p>
+              <div className="section-subtitle">
+                {SONGS.length} songs available to listen to
+              </div>
             </div>
 
-            {/* SEARCH */}
-
-            <div className="w-full md:w-80">
-
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="🔍 Search songs..."
-                className="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 outline-none focus:border-red-500 transition"
-              />
-
-            </div>
+            <input
+              className="search"
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              placeholder="🔍 Search songs..."
+            />
 
           </div>
 
-          {/* CATEGORIES */}
-
-          <div className="flex gap-2 overflow-x-auto py-6 scrollbar-hide">
+          <div className="categories">
 
             {CATEGORIES.map((item) => (
               <button
                 key={item}
-                onClick={() => setCategory(item)}
-                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold border transition ${
-                  category === item
-                    ? "bg-red-600 border-red-600"
-                    : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                className={`category ${
+                  category === item ? "active" : ""
                 }`}
+                onClick={() => setCategory(item)}
               >
                 {item}
               </button>
@@ -431,113 +1128,99 @@ export default function App() {
 
           </div>
 
-          {/* SONG GRID */}
-
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="song-grid">
 
             {filteredSongs.map((song) => {
 
-              const active = currentSong?.id === song.id;
+              const active =
+                currentSong?.id === song.id;
 
               return (
                 <article
-                  key={song.id}
-                  className={`rounded-3xl p-5 border transition ${
-                    active
-                      ? "bg-zinc-900 border-red-600 shadow-xl shadow-red-950/20"
-                      : "bg-zinc-950 border-zinc-900 hover:border-zinc-700"
+                  className={`song-card ${
+                    active ? "active" : ""
                   }`}
+                  key={song.id}
                 >
 
-                  {/* SONG HEADER */}
+                  <div className="song-head">
 
-                  <div className="flex items-center gap-4">
-
-                    <div
-                      className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl ${
-                        active
-                          ? "bg-red-600"
-                          : "bg-zinc-900"
-                      }`}
-                    >
+                    <div className="song-icon">
                       {song.icon}
                     </div>
 
-                    <div className="flex-1 min-w-0">
+                    <div className="song-info">
 
-                      <h3 className="font-black text-lg truncate">
+                      <h3 className="song-title">
                         {song.title}
                       </h3>
 
-                      <p className="text-red-500 text-xs font-bold mt-1">
+                      <div className="song-category">
                         {song.category}
-                      </p>
+                      </div>
 
                     </div>
 
-                    {/* PLAY */}
-
                     <button
-                      onClick={() => playSong(song)}
-                      className="w-13 h-13 min-w-13 rounded-full bg-white text-black font-black text-xl flex items-center justify-center hover:scale-105 transition"
-                      aria-label={
-                        active && isPlaying
-                          ? "Pause song"
-                          : "Play song"
+                      className="play-button"
+                      onClick={() =>
+                        playSong(song)
                       }
                     >
-                      {active && isPlaying ? "⏸" : "▶"}
+                      {active && isPlaying
+                        ? "Ⅱ"
+                        : "▶"}
                     </button>
 
                   </div>
 
-                  {/* ACTIVE INDICATOR */}
-
                   {active && (
-                    <div className="mt-4 text-xs text-red-500 font-bold">
+                    <div className="now-playing">
                       {isPlaying
                         ? "● NOW PLAYING"
                         : "Ⅱ PAUSED"}
                     </div>
                   )}
 
-                  {/* ACTION BUTTONS */}
-
-                  <div className="grid grid-cols-2 gap-2 mt-5">
+                  <div className="song-actions">
 
                     <a
+                      className="download-button"
                       href={song.file}
                       download
-                      className="bg-green-500 hover:bg-green-400 text-black font-black py-3 rounded-xl text-center text-sm transition"
                     >
-                      ⬇️ Download
+                      ⬇ Download
                     </a>
 
                     <button
-                      onClick={() => orderSimilar(song)}
-                      className="bg-white hover:bg-zinc-200 text-black font-black py-3 rounded-xl text-sm transition"
+                      className="order-button"
+                      onClick={() =>
+                        orderSimilar(song)
+                      }
                     >
                       💬 Order Similar
                     </button>
 
                   </div>
 
-                  {/* SECONDARY ACTIONS */}
-
-                  <div className="flex justify-between mt-4 text-sm text-zinc-500">
+                  <div className="song-bottom">
 
                     <button
-                      onClick={() => toggleLike(song.id)}
-                      className="hover:text-red-400 transition"
+                      className="small-action"
+                      onClick={() =>
+                        toggleLike(song.id)
+                      }
                     >
                       ❤️ {likes[song.id] || 0}
                     </button>
 
                     <button
-                      onClick={() => shareSong(song)}
-                      className="hover:text-white transition"
+                      className="small-action"
+                      onClick={() =>
+                        shareSong(song)
+                      }
                     >
-                      ↗️ Share
+                      ↗ Share
                     </button>
 
                   </div>
@@ -548,126 +1231,136 @@ export default function App() {
 
           </div>
 
-          {/* NO RESULTS */}
-
           {filteredSongs.length === 0 && (
-            <div className="text-center py-20">
-
-              <div className="text-4xl">
-                🎵
-              </div>
-
-              <p className="text-zinc-400 mt-3">
-                No songs found for "{search}".
-              </p>
-
-              <button
-                onClick={() => {
-                  setSearch("");
-                  setCategory("All");
-                }}
-                className="text-red-500 font-bold mt-3"
-              >
-                Show all songs
-              </button>
-
+            <div
+              style={{
+                textAlign: "center",
+                padding: "60px 20px",
+                color: "#777",
+              }}
+            >
+              🎵
+              <br />
+              No songs found.
             </div>
           )}
 
-        </div>
+        </section>
 
-        {/* ================= CUSTOM SONG ================= */}
+        {/* CUSTOM SONG */}
 
         <section
           id="order"
-          className="mt-16 rounded-3xl p-7 md:p-12 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black border border-zinc-800 text-center"
+          className="order-section"
         >
 
-          <div className="w-16 h-16 mx-auto rounded-full bg-red-600 flex items-center justify-center text-3xl">
-            🎤
+          <div className="order-box">
+
+            <div className="order-icon">
+              🎤
+            </div>
+
+            <div className="section-label">
+              CUSTOM MUSIC
+            </div>
+
+            <h2>
+              Want Your Own Song?
+            </h2>
+
+            <p>
+              Order a personalized song for a birthday,
+              dedication, celebration, love story or
+              another special moment.
+            </p>
+
+            <p className="price">
+              Starting from 10,000 UGX
+            </p>
+
+            <p>
+              Price can be discussed depending on
+              the project.
+            </p>
+
+            <a
+              className="whatsapp-order"
+              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+                "Hi Steve, I want to order a custom song. Please send me the details."
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              💬 Order on WhatsApp
+            </a>
+
           </div>
-
-          <p className="text-red-500 text-sm font-bold mt-5">
-            CUSTOM MUSIC
-          </p>
-
-          <h2 className="text-3xl md:text-4xl font-black mt-2">
-            Want Your Own Song?
-          </h2>
-
-          <p className="text-zinc-400 max-w-xl mx-auto mt-3">
-            Order a personalized song for a birthday,
-            dedication, celebration, love story or another
-            special moment.
-          </p>
-
-          <p className="text-yellow-400 font-black text-xl mt-5">
-            From 10,000 UGX
-          </p>
-
-          <p className="text-zinc-500 text-xs mt-1">
-            Price can be discussed depending on the project.
-          </p>
-
-          <button
-            onClick={orderCustomSong}
-            className="bg-green-500 hover:bg-green-400 text-black font-black px-8 py-4 rounded-full mt-6 transition"
-          >
-            💬 Order on WhatsApp
-          </button>
 
         </section>
 
-      </main>
+        {/* FOOTER */}
 
-      {/* ================= SHARED AUDIO PLAYER ================= */}
+        <footer className="footer">
+          © 2026 Steve Wiizy Music • Kampala, Uganda
+        </footer>
 
-      {currentSong && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-zinc-800 shadow-2xl">
+        {/* ONE AUDIO PLAYER */}
 
-          <div className="max-w-6xl mx-auto px-4 py-3">
+        {currentSong && (
+          <div className="player">
 
-            <div className="flex items-center gap-3">
+            <div className="player-inner">
 
-              <div className="w-12 h-12 min-w-12 rounded-xl bg-red-600 flex items-center justify-center text-xl">
-                {currentSong.icon}
+              <div className="player-top">
+
+                <div className="player-icon">
+                  {currentSong.icon}
+                </div>
+
+                <div className="player-info">
+
+                  <div className="player-title">
+                    {currentSong.title}
+                  </div>
+
+                  <div className="player-category">
+                    {currentSong.category} • Steve Wiizy
+                  </div>
+
+                </div>
+
+                <button
+                  className="player-toggle"
+                  onClick={() =>
+                    playSong(currentSong)
+                  }
+                >
+                  {isPlaying ? "Ⅱ" : "▶"}
+                </button>
+
               </div>
 
-              <div className="flex-1 min-w-0">
-
-                <p className="font-black text-sm truncate">
-                  {currentSong.title}
-                </p>
-
-                <p className="text-xs text-zinc-500">
-                  {currentSong.category} • Steve Wiizy
-                </p>
-
-              </div>
-
-              <button
-                onClick={() => playSong(currentSong)}
-                className="w-11 h-11 min-w-11 rounded-full bg-white text-black font-black"
-              >
-                {isPlaying ? "⏸" : "▶"}
-              </button>
+              <audio
+                ref={audioRef}
+                className="audio"
+                controls
+                onPlay={() =>
+                  setIsPlaying(true)
+                }
+                onPause={() =>
+                  setIsPlaying(false)
+                }
+                onEnded={() =>
+                  setIsPlaying(false)
+                }
+              />
 
             </div>
 
-            <audio
-              ref={audioRef}
-              controls
-              className="w-full mt-2 h-9"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => setIsPlaying(false)}
-            />
-
           </div>
+        )}
 
-        </div>
-      )}
-
-    </div>
+      </div>
+    </>
   );
 }
