@@ -1,75 +1,94 @@
 import { useEffect, useRef, useState } from "react";
 
+/* =========================================================
+   STEVE WIIZY MUSIC WEBSITE
+   GitHub / GitHub Pages friendly version
+   ========================================================= */
+
 const WHATSAPP = "256743911998";
+
+/*
+  GitHub Pages can host the site inside a repository folder.
+  BASE_URL automatically handles that folder.
+*/
+const BASE_URL =
+  typeof import.meta !== "undefined" &&
+  import.meta.env &&
+  import.meta.env.BASE_URL
+    ? import.meta.env.BASE_URL
+    : "/";
+
+const musicFile = (fileName) =>
+  `${BASE_URL}${encodeURIComponent(fileName).replace(/%2F/g, "/")}`;
 
 const SONGS = [
   {
     id: 1,
     title: "Endless Love Swing",
-    file: "/Endless%20Love%20Swing.mp3",
+    file: "Endless Love Swing.mp3",
     category: "Love",
     icon: "❤️",
   },
   {
     id: 2,
     title: "Esie, My Bestie",
-    file: "/Esie,%20My%20Bestie.mp3",
+    file: "Esie, My Bestie.mp3",
     category: "Love",
     icon: "🎶",
   },
   {
     id: 3,
     title: "For the Rest of My Life",
-    file: "/For%20the%20Rest%20of%20My%20Life.mp3",
+    file: "For the Rest of My Life.mp3",
     category: "Dedicated",
     icon: "🎤",
   },
   {
     id: 4,
     title: "Holy Spirit Flow",
-    file: "/Holy%20Spirit%20Flow.mp3",
+    file: "Holy Spirit Flow.mp3",
     category: "Gospel",
     icon: "🙏",
   },
   {
     id: 5,
     title: "Moonlight Counted Tears",
-    file: "/Moonlight%20Counted%20Tears.mp3",
+    file: "Moonlight Counted Tears.mp3",
     category: "Love",
     icon: "🌙",
   },
   {
     id: 6,
     title: "Reza Towers Again",
-    file: "/Reza%20Towers%20Again.mp3",
+    file: "Reza Towers Again.mp3",
     category: "Vibe",
     icon: "🏢",
   },
   {
     id: 7,
     title: "Reza Towers",
-    file: "/Reza%20Towers.mp3",
+    file: "Reza Towers.mp3",
     category: "Vibe",
     icon: "🎧",
   },
   {
     id: 8,
     title: "Steve Vibes",
-    file: "/Steve%20Vibes.mp3",
+    file: "Steve Vibes.mp3",
     category: "Vibe",
     icon: "🔥",
   },
   {
     id: 9,
     title: "SteveWiizy GenZ",
-    file: "/SteveWiizy%20GenZ.mp3",
+    file: "SteveWiizy GenZ.mp3",
     category: "GenZ",
     icon: "💿",
   },
   {
     id: 10,
     title: "SteveWiizy GenZ2",
-    file: "/SteveWiizy%20GenZ2.mp3",
+    file: "SteveWiizy GenZ2.mp3",
     category: "GenZ",
     icon: "🎵",
   },
@@ -84,15 +103,39 @@ const CATEGORIES = [
   "Dedicated",
 ];
 
+/* =========================================================
+   APP
+   ========================================================= */
+
 export default function App() {
   const audioRef = useRef(null);
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
+
   const [currentSong, setCurrentSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
   const [likes, setLikes] = useState({});
+
   const [menuOpen, setMenuOpen] = useState(false);
+
+  /* CUSTOM ORDER FORM */
+
+  const [order, setOrder] = useState({
+    songType: "",
+    style: "",
+    mood: "",
+    language: "",
+    duration: "",
+    forWho: "",
+    topic: "",
+    details: "",
+  });
+
+  /* =======================================================
+     FILTER SONGS
+     ======================================================= */
 
   const filteredSongs = SONGS.filter((song) => {
     const categoryMatch =
@@ -105,34 +148,38 @@ export default function App() {
     return categoryMatch && searchMatch;
   });
 
-  useEffect(() => {
-    if (!currentSong || !audioRef.current) return;
+  /* =======================================================
+     GET FULL GITHUB-FRIENDLY SONG URL
+     ======================================================= */
 
-    const audio = audioRef.current;
+  const getSongUrl = (song) => {
+    return musicFile(song.file);
+  };
 
-    audio.pause();
-    audio.src = currentSong.file;
-    audio.load();
-
-    if (isPlaying) {
-      audio
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false));
-    }
-  }, [currentSong]);
+  /* =======================================================
+     PLAY SONG
+     ======================================================= */
 
   const playSong = (song) => {
     const audio = audioRef.current;
 
     if (!audio) return;
 
+    const songUrl = getSongUrl(song);
+
+    /*
+      If the same song is selected:
+      pause/resume it.
+    */
     if (currentSong?.id === song.id) {
       if (audio.paused) {
         audio
           .play()
           .then(() => setIsPlaying(true))
-          .catch(() => {});
+          .catch((error) => {
+            console.error("Audio playback error:", error);
+            setIsPlaying(false);
+          });
       } else {
         audio.pause();
         setIsPlaying(false);
@@ -141,11 +188,30 @@ export default function App() {
       return;
     }
 
+    /*
+      Stop the previous song before loading another one.
+    */
     audio.pause();
 
+    audio.src = songUrl;
+    audio.load();
+
     setCurrentSong(song);
-    setIsPlaying(true);
+
+    audio
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+      })
+      .catch((error) => {
+        console.error("Could not play audio:", error);
+        setIsPlaying(false);
+      });
   };
+
+  /* =======================================================
+     LIKE
+     ======================================================= */
 
   const toggleLike = (id) => {
     setLikes((old) => ({
@@ -154,25 +220,9 @@ export default function App() {
     }));
   };
 
-  const orderSimilar = (song) => {
-    const message =
-      `Hi Steve, I want a song similar to "${song.title}".`;
-
-    window.open(
-      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
-  };
-
-  const orderCustomSong = () => {
-    const message =
-      "Hi Steve, I want to order a custom song. Please send me the details.";
-
-    window.open(
-      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
-  };
+  /* =======================================================
+     SHARE
+     ======================================================= */
 
   const shareSong = async (song) => {
     const text = `🎵 ${song.title} by Steve Wiizy`;
@@ -184,18 +234,87 @@ export default function App() {
           text,
           url: window.location.href,
         });
-      } catch {}
+      } catch {
+        // Sharing cancelled
+      }
     } else {
       try {
         await navigator.clipboard.writeText(
-          `${text} ${window.location.href}`
+          `${text} - ${window.location.href}`
         );
+
         alert("Song link copied!");
       } catch {
         alert("Unable to copy the link.");
       }
     }
   };
+
+  /* =======================================================
+     SIMILAR SONG WHATSAPP
+     ======================================================= */
+
+  const orderSimilar = (song) => {
+    const message =
+      `Hi Steve, I want a song similar to "${song.title}".`;
+
+    window.open(
+      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
+  };
+
+  /* =======================================================
+     UPDATE CUSTOM ORDER
+     ======================================================= */
+
+  const updateOrder = (field, value) => {
+    setOrder((old) => ({
+      ...old,
+      [field]: value,
+    }));
+  };
+
+  /* =======================================================
+     SEND CUSTOM ORDER TO WHATSAPP
+     ======================================================= */
+
+  const submitCustomOrder = (event) => {
+    event.preventDefault();
+
+    const message = `
+🎤 STEVE WIIZY CUSTOM SONG ORDER
+
+Song Type: ${order.songType || "Not specified"}
+
+Music Style: ${order.style || "Not specified"}
+
+Mood / Vibe: ${order.mood || "Not specified"}
+
+Language: ${order.language || "Not specified"}
+
+Duration: ${order.duration || "Not specified"}
+
+Song For: ${order.forWho || "Not specified"}
+
+What the song should be about:
+${order.topic || "Not specified"}
+
+Special message / extra details:
+${order.details || "Not specified"}
+
+Please let me know the price and next steps.
+    `.trim();
+
+    window.open(
+      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
+  };
+
+  /* =======================================================
+     NAVIGATION
+     ======================================================= */
 
   const scrollToMusic = () => {
     document
@@ -212,6 +331,10 @@ export default function App() {
 
     setMenuOpen(false);
   };
+
+  /* =======================================================
+     DESIGN
+     ======================================================= */
 
   return (
     <>
@@ -239,7 +362,9 @@ export default function App() {
         }
 
         button,
-        input {
+        input,
+        select,
+        textarea {
           font: inherit;
         }
 
@@ -253,20 +378,20 @@ export default function App() {
           background:
             radial-gradient(
               circle at 50% 0%,
-              rgba(220, 20, 60, 0.13),
+              rgba(220, 20, 60, 0.14),
               transparent 32%
             ),
             #070709;
-          padding-bottom: 120px;
+          padding-bottom: 130px;
         }
 
-        /* HEADER */
+        /* ================= HEADER ================= */
 
         .header {
           position: sticky;
           top: 0;
           z-index: 100;
-          background: rgba(7, 7, 9, 0.92);
+          background: rgba(7, 7, 9, 0.94);
           backdrop-filter: blur(18px);
           border-bottom: 1px solid #202024;
         }
@@ -288,6 +413,7 @@ export default function App() {
           background: none;
           color: white;
           cursor: pointer;
+          padding: 0;
         }
 
         .brand-logo {
@@ -304,7 +430,6 @@ export default function App() {
           align-items: center;
           justify-content: center;
           font-weight: 900;
-          font-size: 15px;
         }
 
         .brand-name {
@@ -327,7 +452,7 @@ export default function App() {
         .nav {
           display: flex;
           align-items: center;
-          gap: 26px;
+          gap: 25px;
         }
 
         .nav button {
@@ -335,7 +460,6 @@ export default function App() {
           background: none;
           color: #aaa;
           cursor: pointer;
-          font-size: 14px;
         }
 
         .nav button:hover {
@@ -366,12 +490,12 @@ export default function App() {
           display: none;
         }
 
-        /* HERO */
+        /* ================= HERO ================= */
 
         .hero {
           max-width: 1000px;
           margin: auto;
-          padding: 85px 22px 75px;
+          padding: 75px 22px 70px;
           text-align: center;
         }
 
@@ -391,7 +515,8 @@ export default function App() {
           justify-content: center;
           font-size: 31px;
           font-weight: 900;
-          box-shadow: 0 20px 70px rgba(255, 23, 68, 0.2);
+          box-shadow:
+            0 20px 70px rgba(255, 23, 68, 0.2);
         }
 
         .hero-label {
@@ -444,16 +569,12 @@ export default function App() {
           color: white;
         }
 
-        .primary-button:hover {
-          background: #e9143d;
-        }
-
         .secondary-button {
           background: white;
           color: #080808;
         }
 
-        /* MUSIC */
+        /* ================= MUSIC ================= */
 
         .music-section {
           max-width: 1150px;
@@ -532,11 +653,12 @@ export default function App() {
           color: white;
         }
 
-        /* SONG GRID */
+        /* ================= SONG CARDS ================= */
 
         .song-grid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns:
+            repeat(2, minmax(0, 1fr));
           gap: 17px;
         }
 
@@ -616,10 +738,6 @@ export default function App() {
           font-weight: 900;
         }
 
-        .play-button:hover {
-          transform: scale(1.06);
-        }
-
         .now-playing {
           color: #ff1744;
           font-size: 10px;
@@ -637,7 +755,6 @@ export default function App() {
 
         .download-button,
         .order-button {
-          text-decoration: none;
           border: 0;
           padding: 11px 8px;
           border-radius: 11px;
@@ -645,6 +762,7 @@ export default function App() {
           font-size: 12px;
           font-weight: 850;
           cursor: pointer;
+          text-decoration: none;
         }
 
         .download-button {
@@ -671,14 +789,10 @@ export default function App() {
           font-size: 12px;
         }
 
-        .small-action:hover {
-          color: white;
-        }
-
-        /* ORDER */
+        /* ================= CUSTOM ORDER ================= */
 
         .order-section {
-          max-width: 850px;
+          max-width: 900px;
           margin: 80px auto 0;
           padding: 0 22px;
         }
@@ -686,8 +800,7 @@ export default function App() {
         .order-box {
           border: 1px solid #29292f;
           border-radius: 28px;
-          padding: 48px 25px;
-          text-align: center;
+          padding: 40px 25px;
           background:
             radial-gradient(
               circle at 50% 0%,
@@ -695,6 +808,10 @@ export default function App() {
               transparent 50%
             ),
             #101014;
+        }
+
+        .order-heading {
+          text-align: center;
         }
 
         .order-icon {
@@ -714,33 +831,81 @@ export default function App() {
           font-size: 32px;
         }
 
-        .order-box p {
-          max-width: 580px;
-          margin: 13px auto 0;
+        .order-description {
+          max-width: 600px;
+          margin: 12px auto 25px;
           color: #85858e;
           line-height: 1.6;
           font-size: 14px;
+          text-align: center;
         }
 
         .price {
-          color: #ffd43b !important;
-          font-size: 19px !important;
+          color: #ffd43b;
           font-weight: 900;
-          margin-top: 20px !important;
+          text-align: center;
+          font-size: 18px;
+          margin-bottom: 28px;
         }
 
-        .whatsapp-order {
-          display: inline-block;
-          text-decoration: none;
+        .order-form {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+        }
+
+        .form-group.full {
+          grid-column: 1 / -1;
+        }
+
+        .form-label {
+          color: #b7b7bf;
+          font-size: 12px;
+          font-weight: 750;
+        }
+
+        .form-control {
+          width: 100%;
+          border: 1px solid #29292f;
+          background: #09090b;
+          color: white;
+          border-radius: 12px;
+          padding: 13px 14px;
+          outline: none;
+        }
+
+        .form-control:focus {
+          border-color: #ff1744;
+        }
+
+        textarea.form-control {
+          resize: vertical;
+          min-height: 105px;
+        }
+
+        .submit-order {
+          grid-column: 1 / -1;
+          border: 0;
           background: #25d366;
           color: #061108;
+          padding: 15px;
+          border-radius: 13px;
           font-weight: 900;
-          padding: 14px 25px;
-          border-radius: 999px;
-          margin-top: 20px;
+          cursor: pointer;
+          margin-top: 4px;
         }
 
-        /* PLAYER */
+        .submit-order:hover {
+          background: #38e078;
+        }
+
+        /* ================= PLAYER ================= */
 
         .player {
           position: fixed;
@@ -748,15 +913,16 @@ export default function App() {
           left: 0;
           right: 0;
           z-index: 200;
-          background: rgba(10, 10, 12, 0.96);
+          background: rgba(10, 10, 12, 0.97);
           backdrop-filter: blur(20px);
           border-top: 1px solid #29292f;
+          box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
         }
 
         .player-inner {
           max-width: 1150px;
           margin: auto;
-          padding: 11px 22px;
+          padding: 10px 22px;
         }
 
         .player-top {
@@ -803,6 +969,7 @@ export default function App() {
           background: white;
           color: black;
           font-weight: 900;
+          cursor: pointer;
         }
 
         .audio {
@@ -811,7 +978,7 @@ export default function App() {
           margin-top: 5px;
         }
 
-        /* FOOTER */
+        /* ================= FOOTER ================= */
 
         .footer {
           text-align: center;
@@ -820,7 +987,7 @@ export default function App() {
           padding: 45px 20px 10px;
         }
 
-        /* MOBILE */
+        /* ================= MOBILE ================= */
 
         @media (max-width: 700px) {
 
@@ -929,24 +1096,37 @@ export default function App() {
           }
 
           .order-box {
-            padding: 38px 19px;
+            padding: 35px 17px;
           }
 
           .order-box h2 {
             font-size: 27px;
           }
 
+          .order-form {
+            grid-template-columns: 1fr;
+          }
+
+          .form-group.full {
+            grid-column: auto;
+          }
+
+          .submit-order {
+            grid-column: auto;
+          }
+
           .player-inner {
             padding: 9px 12px;
           }
-
         }
 
       `}</style>
 
       <div className="site">
 
-        {/* HEADER */}
+        {/* =================================================
+            HEADER
+            ================================================= */}
 
         <header className="header">
 
@@ -1011,7 +1191,6 @@ export default function App() {
               menuOpen ? "open" : ""
             }`}
           >
-
             <button onClick={scrollToMusic}>
               🎵 Music
             </button>
@@ -1027,12 +1206,13 @@ export default function App() {
             >
               💬 WhatsApp Steve
             </a>
-
           </div>
 
         </header>
 
-        {/* HERO */}
+        {/* =================================================
+            HERO
+            ================================================= */}
 
         <section className="hero">
 
@@ -1054,8 +1234,7 @@ export default function App() {
 
           <p>
             Listen to my music, discover different vibes
-            and order a custom song for your special
-            moment.
+            and order a custom song for your special moment.
           </p>
 
           <div className="hero-actions">
@@ -1078,7 +1257,9 @@ export default function App() {
 
         </section>
 
-        {/* MUSIC */}
+        {/* =================================================
+            MUSIC
+            ================================================= */}
 
         <section
           id="music"
@@ -1118,9 +1299,13 @@ export default function App() {
               <button
                 key={item}
                 className={`category ${
-                  category === item ? "active" : ""
+                  category === item
+                    ? "active"
+                    : ""
                 }`}
-                onClick={() => setCategory(item)}
+                onClick={() =>
+                  setCategory(item)
+                }
               >
                 {item}
               </button>
@@ -1186,8 +1371,8 @@ export default function App() {
 
                     <a
                       className="download-button"
-                      href={song.file}
-                      download
+                      href={getSongUrl(song)}
+                      download={song.file}
                     >
                       ⬇ Download
                     </a>
@@ -1231,23 +1416,11 @@ export default function App() {
 
           </div>
 
-          {filteredSongs.length === 0 && (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "60px 20px",
-                color: "#777",
-              }}
-            >
-              🎵
-              <br />
-              No songs found.
-            </div>
-          )}
-
         </section>
 
-        {/* CUSTOM SONG */}
+        {/* =================================================
+            CUSTOM SONG ORDER
+            ================================================= */}
 
         <section
           id="order"
@@ -1256,55 +1429,412 @@ export default function App() {
 
           <div className="order-box">
 
-            <div className="order-icon">
-              🎤
+            <div className="order-heading">
+
+              <div className="order-icon">
+                🎤
+              </div>
+
+              <div
+                className="section-label"
+                style={{ marginTop: "20px" }}
+              >
+                CUSTOM MUSIC
+              </div>
+
+              <h2>
+                Create Your Own Song
+              </h2>
+
+              <p className="order-description">
+                Tell Steve Wiizy what you want and send
+                your request directly to WhatsApp.
+              </p>
+
+              <div className="price">
+                Starting from 10,000 UGX
+              </div>
+
             </div>
 
-            <div className="section-label">
-              CUSTOM MUSIC
-            </div>
-
-            <h2>
-              Want Your Own Song?
-            </h2>
-
-            <p>
-              Order a personalized song for a birthday,
-              dedication, celebration, love story or
-              another special moment.
-            </p>
-
-            <p className="price">
-              Starting from 10,000 UGX
-            </p>
-
-            <p>
-              Price can be discussed depending on
-              the project.
-            </p>
-
-            <a
-              className="whatsapp-order"
-              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-                "Hi Steve, I want to order a custom song. Please send me the details."
-              )}`}
-              target="_blank"
-              rel="noreferrer"
+            <form
+              className="order-form"
+              onSubmit={submitCustomOrder}
             >
-              💬 Order on WhatsApp
-            </a>
+
+              {/* SONG TYPE */}
+
+              <div className="form-group">
+
+                <label className="form-label">
+                  What type of song? *
+                </label>
+
+                <select
+                  className="form-control"
+                  value={order.songType}
+                  onChange={(e) =>
+                    updateOrder(
+                      "songType",
+                      e.target.value
+                    )
+                  }
+                  required
+                >
+                  <option value="">
+                    Select song type
+                  </option>
+
+                  <option>
+                    Love Song
+                  </option>
+
+                  <option>
+                    Birthday Song
+                  </option>
+
+                  <option>
+                    Dedication
+                  </option>
+
+                  <option>
+                    Gospel
+                  </option>
+
+                  <option>
+                    Graduation
+                  </option>
+
+                  <option>
+                    Motivation
+                  </option>
+
+                  <option>
+                    Friendship / Bestie
+                  </option>
+
+                  <option>
+                    Celebration
+                  </option>
+
+                  <option>
+                    Other
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* STYLE */}
+
+              <div className="form-group">
+
+                <label className="form-label">
+                  Music style *
+                </label>
+
+                <select
+                  className="form-control"
+                  value={order.style}
+                  onChange={(e) =>
+                    updateOrder(
+                      "style",
+                      e.target.value
+                    )
+                  }
+                  required
+                >
+                  <option value="">
+                    Choose a style
+                  </option>
+
+                  <option>
+                    Afrobeat
+                  </option>
+
+                  <option>
+                    Afropop
+                  </option>
+
+                  <option>
+                    Amapiano
+                  </option>
+
+                  <option>
+                    R&B
+                  </option>
+
+                  <option>
+                    Gospel
+                  </option>
+
+                  <option>
+                    Dancehall
+                  </option>
+
+                  <option>
+                    Acoustic
+                  </option>
+
+                  <option>
+                    Chill / Emotional
+                  </option>
+
+                  <option>
+                    Gen Z / Vibe
+                  </option>
+
+                  <option>
+                    Not sure - recommend one
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* MOOD */}
+
+              <div className="form-group">
+
+                <label className="form-label">
+                  Mood / Vibe
+                </label>
+
+                <select
+                  className="form-control"
+                  value={order.mood}
+                  onChange={(e) =>
+                    updateOrder(
+                      "mood",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Choose mood
+                  </option>
+
+                  <option>
+                    Romantic ❤️
+                  </option>
+
+                  <option>
+                    Happy 😊
+                  </option>
+
+                  <option>
+                    Emotional 🌙
+                  </option>
+
+                  <option>
+                    Energetic 🔥
+                  </option>
+
+                  <option>
+                    Peaceful 🙏
+                  </option>
+
+                  <option>
+                    Inspirational 💪
+                  </option>
+
+                  <option>
+                    Party 🎉
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* LANGUAGE */}
+
+              <div className="form-group">
+
+                <label className="form-label">
+                  Language
+                </label>
+
+                <select
+                  className="form-control"
+                  value={order.language}
+                  onChange={(e) =>
+                    updateOrder(
+                      "language",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Choose language
+                  </option>
+
+                  <option>
+                    English
+                  </option>
+
+                  <option>
+                    Luganda
+                  </option>
+
+                  <option>
+                    Swahili
+                  </option>
+
+                  <option>
+                    English + Luganda
+                  </option>
+
+                  <option>
+                    English + Swahili
+                  </option>
+
+                  <option>
+                    Other
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* DURATION */}
+
+              <div className="form-group">
+
+                <label className="form-label">
+                  Desired duration
+                </label>
+
+                <select
+                  className="form-control"
+                  value={order.duration}
+                  onChange={(e) =>
+                    updateOrder(
+                      "duration",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Choose duration
+                  </option>
+
+                  <option>
+                    1–2 minutes
+                  </option>
+
+                  <option>
+                    2–3 minutes
+                  </option>
+
+                  <option>
+                    3–4 minutes
+                  </option>
+
+                  <option>
+                    4+ minutes
+                  </option>
+
+                  <option>
+                    Not sure
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* WHO */}
+
+              <div className="form-group">
+
+                <label className="form-label">
+                  Who is the song for?
+                </label>
+
+                <input
+                  className="form-control"
+                  value={order.forWho}
+                  onChange={(e) =>
+                    updateOrder(
+                      "forWho",
+                      e.target.value
+                    )
+                  }
+                  placeholder="e.g. My bestie, mum, partner..."
+                />
+
+              </div>
+
+              {/* TOPIC */}
+
+              <div className="form-group full">
+
+                <label className="form-label">
+                  What should the song be about? *
+                </label>
+
+                <textarea
+                  className="form-control"
+                  value={order.topic}
+                  onChange={(e) =>
+                    updateOrder(
+                      "topic",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Tell us the story, names, occasion, feelings, important details..."
+                  required
+                />
+
+              </div>
+
+              {/* EXTRA DETAILS */}
+
+              <div className="form-group full">
+
+                <label className="form-label">
+                  Special message / extra instructions
+                </label>
+
+                <textarea
+                  className="form-control"
+                  value={order.details}
+                  onChange={(e) =>
+                    updateOrder(
+                      "details",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Anything else you want included in the song?"
+                />
+
+              </div>
+
+              {/* SUBMIT */}
+
+              <button
+                type="submit"
+                className="submit-order"
+              >
+                💬 Send Custom Song Order on WhatsApp
+              </button>
+
+            </form>
 
           </div>
 
         </section>
 
-        {/* FOOTER */}
+        {/* =================================================
+            FOOTER
+            ================================================= */}
 
         <footer className="footer">
           © 2026 Steve Wiizy Music • Kampala, Uganda
         </footer>
 
-        {/* ONE AUDIO PLAYER */}
+        {/* =================================================
+            SINGLE AUDIO PLAYER
+            ================================================= */}
 
         {currentSong && (
           <div className="player">
@@ -1344,6 +1874,7 @@ export default function App() {
                 ref={audioRef}
                 className="audio"
                 controls
+                preload="metadata"
                 onPlay={() =>
                   setIsPlaying(true)
                 }
@@ -1353,6 +1884,13 @@ export default function App() {
                 onEnded={() =>
                   setIsPlaying(false)
                 }
+                onError={(event) => {
+                  console.error(
+                    "Audio file could not be loaded:",
+                    event
+                  );
+                  setIsPlaying(false);
+                }}
               />
 
             </div>
