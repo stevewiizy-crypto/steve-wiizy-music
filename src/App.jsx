@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
    GitHub / GitHub Pages friendly version
    ========================================================= */
 
-const WHATSAPP = "256743911998";
+const WHATSAPP = "+256743911998";
 
 const BASE_URL =
   typeof import.meta!== "undefined" &&
@@ -228,7 +228,7 @@ export default function App() {
 
         <section id="order" className="order-section">
           <div className="order-box">
-            <div className="order-heading"><div className="order-icon">🎤</div><h2>Order Custom Song</h2><p className="order-description">Want a song made just for you, your lover, church, or business? Tell me what you want.</p><div className="price">Starting from 50,000 UGX</div></div>
+            <div className="order-heading"><div className="order-icon">🎤</div><h2>Order Custom Song</h2><p className="order-description">Want a song made just for you, your lover, church, or business? Tell me what you want.</p><div className="price">Starting from 10,000 UGX</div></div>
             <form className="order-form" onSubmit={submitCustomOrder}>
               <div className="form-group"><label className="form-label">Song Type</label><select className="form-control" value={order.songType} onChange={e=>updateOrder("songType",e.target.value)}><option value="">Select</option><option>Love</option><option>Gospel</option><option>Birthday</option><option>Business</option><option>GenZ</option></select></div>
               <div className="form-group"><label className="form-label">Music Style</label><input className="form-control" value={order.style} onChange={e=>updateOrder("style",e.target.value)} placeholder="Afrobeat, Slow..."/></div>
