@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+
 
 const WHATSAPP = "256743911998";
 
@@ -16,6 +16,23 @@ const COVER = `${cleanBase}IMG-20260831-WA9770.jpg`;
 const musicFile = (file) =>
   `${cleanBase}${encodeURIComponent(file).replace(/%2F/g, "/")}`;
 
+/*
+  MUSIC STATUS
+  -------------
+  sample = existing songs / preview reference
+  free   = free download
+  paid   = new song available for UGX 500 download
+
+  Your existing 17 songs are ALL samples.
+  When you add a new song later, simply use:
+  
+  status: "paid"
+  
+  or:
+  
+  status: "free"
+*/
+
 const SONGS = [
   {
     id: 1,
@@ -25,6 +42,7 @@ const SONGS = [
     dur: "2:45",
     cat: "Love",
     emoji: "❤️",
+    status: "sample",
   },
   {
     id: 2,
@@ -34,6 +52,7 @@ const SONGS = [
     dur: "3:12",
     cat: "Love",
     emoji: "💖",
+    status: "sample",
   },
   {
     id: 3,
@@ -43,6 +62,7 @@ const SONGS = [
     dur: "3:05",
     cat: "Love",
     emoji: "💕",
+    status: "sample",
   },
   {
     id: 4,
@@ -52,6 +72,7 @@ const SONGS = [
     dur: "2:58",
     cat: "Love",
     emoji: "👑",
+    status: "sample",
   },
   {
     id: 5,
@@ -61,6 +82,7 @@ const SONGS = [
     dur: "3:20",
     cat: "Love",
     emoji: "🎶",
+    status: "sample",
   },
   {
     id: 6,
@@ -70,6 +92,7 @@ const SONGS = [
     dur: "3:45",
     cat: "Dedicated",
     emoji: "💝",
+    status: "sample",
   },
   {
     id: 7,
@@ -79,6 +102,7 @@ const SONGS = [
     dur: "3:10",
     cat: "Gospel",
     emoji: "🙏",
+    status: "sample",
   },
   {
     id: 8,
@@ -88,6 +112,7 @@ const SONGS = [
     dur: "2:55",
     cat: "Vibe",
     emoji: "🔥",
+    status: "sample",
   },
   {
     id: 9,
@@ -97,6 +122,7 @@ const SONGS = [
     dur: "3:30",
     cat: "Love",
     emoji: "🌙",
+    status: "sample",
   },
   {
     id: 10,
@@ -106,6 +132,7 @@ const SONGS = [
     dur: "3:15",
     cat: "Love",
     emoji: "❤️",
+    status: "sample",
   },
   {
     id: 11,
@@ -115,6 +142,7 @@ const SONGS = [
     dur: "2:50",
     cat: "Love",
     emoji: "💃",
+    status: "sample",
   },
   {
     id: 12,
@@ -124,6 +152,7 @@ const SONGS = [
     dur: "2:40",
     cat: "Love",
     emoji: "💗",
+    status: "sample",
   },
   {
     id: 13,
@@ -133,6 +162,7 @@ const SONGS = [
     dur: "3:22",
     cat: "Vibe",
     emoji: "🏢",
+    status: "sample",
   },
   {
     id: 14,
@@ -142,6 +172,7 @@ const SONGS = [
     dur: "3:08",
     cat: "Vibe",
     emoji: "🎧",
+    status: "sample",
   },
   {
     id: 15,
@@ -151,6 +182,7 @@ const SONGS = [
     dur: "2:52",
     cat: "Love",
     emoji: "✨",
+    status: "sample",
   },
   {
     id: 16,
@@ -160,6 +192,7 @@ const SONGS = [
     dur: "3:00",
     cat: "Vibe",
     emoji: "🔥",
+    status: "sample",
   },
   {
     id: 17,
@@ -169,7 +202,30 @@ const SONGS = [
     dur: "3:50",
     cat: "GenZ",
     emoji: "💿",
+    status: "sample",
   },
+
+  /*
+    ADD NEW SONGS BELOW THIS LINE
+
+    Example:
+
+    {
+      id: 18,
+      title: "Your New Song",
+      file: "Your New Song.mp3",
+      size: "4.0 MB",
+      dur: "3:15",
+      cat: "Love",
+      emoji: "❤️",
+      status: "paid",
+    },
+
+    status:
+      "paid" = UGX 500 download
+      "free" = free download
+      "sample" = preview/sample only
+  */
 ];
 
 const CATS = [
@@ -181,6 +237,30 @@ const CATS = [
   "Motivation",
   "Vibe",
   "Dedicated",
+];
+
+const CUSTOM_PACKAGES = [
+  {
+    id: "basic",
+    name: "Starter",
+    price: 10000,
+    label: "10,000 UGX",
+    description: "Simple personalized song",
+  },
+  {
+    id: "standard",
+    name: "Premium",
+    price: 20000,
+    label: "20,000 UGX",
+    description: "More detailed custom song",
+  },
+  {
+    id: "pro",
+    name: "Full Custom",
+    price: 30000,
+    label: "30,000 UGX",
+    description: "Full custom song experience",
+  },
 ];
 
 function App() {
@@ -195,9 +275,18 @@ function App() {
   const [volume, setVolume] = useState(1);
   const [message, setMessage] = useState("");
 
+  const [selectedPackage, setSelectedPackage] = useState("standard");
+
+  const [downloadSong, setDownloadSong] = useState(null);
+
+  const [paymentMethod, setPaymentMethod] =
+    useState("MTN Mobile Money");
+
   const [likes, setLikes] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("steveWiizyLikes")) || {};
+      return JSON.parse(
+        localStorage.getItem("steveWiizyLikes")
+      ) || {};
     } catch {
       return {};
     }
@@ -219,7 +308,8 @@ function App() {
     const term = search.trim().toLowerCase();
 
     return SONGS.filter((song) => {
-      const categoryMatch = cat === "All" || song.cat === cat;
+      const categoryMatch =
+        cat === "All" || song.cat === cat;
 
       const searchMatch =
         !term ||
@@ -231,6 +321,11 @@ function App() {
   }, [cat, search]);
 
   const featured = SONGS.slice(0, 3);
+
+  const currentPackage =
+    CUSTOM_PACKAGES.find(
+      (item) => item.id === selectedPackage
+    ) || CUSTOM_PACKAGES[1];
 
   useEffect(() => {
     try {
@@ -280,7 +375,10 @@ function App() {
     audio.addEventListener("ended", handleEnded);
 
     return () => {
-      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener(
+        "ended",
+        handleEnded
+      );
     };
   }, [current]);
 
@@ -302,10 +400,6 @@ function App() {
         await audio.play();
         setPlaying(true);
       } catch {
-        /*
-          Some browsers block automatic playback.
-          The user can simply tap Play.
-        */
         setPlaying(false);
       }
     };
@@ -416,7 +510,9 @@ function App() {
       `Mood: ${order.mood}`,
       `Duration: ${order.duration}`,
       `Language: ${order.language}`,
-      `Budget: ${order.budget || "Negotiable"}`,
+      `Package: ${currentPackage.name}`,
+      `Price: ${currentPackage.label}`,
+      `Budget: ${order.budget || "Not provided"}`,
       `Details: ${order.details || "Not provided"}`,
       "",
       "Please let me know the next step. Thank you!",
@@ -435,6 +531,35 @@ function App() {
   const submitOrder = (e) => {
     e.preventDefault();
     orderOnWhatsApp();
+  };
+
+  const openPaidDownload = (song) => {
+    setDownloadSong(song);
+  };
+
+  const continuePaidDownload = () => {
+    if (!downloadSong) return;
+
+    const text = [
+      "Hi Steve Wiizy 👋",
+      "",
+      "🎵 NEW SONG DOWNLOAD",
+      `Song: ${downloadSong.title}`,
+      "Price: 500 UGX",
+      `Payment method: ${paymentMethod}`,
+      "",
+      "I want to purchase this new song.",
+      "Please send me the payment instructions.",
+    ].join("\n");
+
+    window.open(
+      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+        text
+      )}`,
+      "_blank"
+    );
+
+    setDownloadSong(null);
   };
 
   const formatTime = (seconds) => {
@@ -877,6 +1002,11 @@ function App() {
           color: #05210f;
         }
 
+        .sampleBtn {
+          background: #ffcc00;
+          color: #251b00;
+        }
+
         .order {
           background: white;
           color: #111;
@@ -941,6 +1071,49 @@ function App() {
           font-size: 12px;
           line-height: 1.65;
           opacity: .8;
+        }
+
+        .packageGrid {
+          display: grid;
+          grid-template-columns:
+            repeat(3, 1fr);
+          gap: 9px;
+          margin-bottom: 16px;
+        }
+
+        .package {
+          border: 1px solid rgba(255,255,255,.20);
+          border-radius: 15px;
+          background: rgba(255,255,255,.08);
+          color: white;
+          padding: 13px 8px;
+          cursor: pointer;
+          text-align: center;
+        }
+
+        .package.active {
+          background: white;
+          color: #e84900;
+          border-color: white;
+          box-shadow:
+            0 8px 25px rgba(255,255,255,.15);
+        }
+
+        .packageName {
+          font-size: 12px;
+          font-weight: 950;
+        }
+
+        .packagePrice {
+          margin-top: 4px;
+          font-size: 17px;
+          font-weight: 950;
+        }
+
+        .packageDescription {
+          margin-top: 3px;
+          font-size: 8px;
+          opacity: .7;
         }
 
         .formGrid {
@@ -1218,6 +1391,111 @@ function App() {
           accent-color: #ff8c00;
         }
 
+        /* PAYMENT / DOWNLOAD MODAL */
+
+        .modalOverlay {
+          position: fixed;
+          inset: 0;
+          z-index: 200;
+          display: grid;
+          place-items: center;
+          padding: 18px;
+          background: rgba(0,0,0,.68);
+          backdrop-filter: blur(10px);
+        }
+
+        .paymentModal {
+          width: min(430px, 100%);
+          padding: 22px;
+          border-radius: 24px;
+          background:
+            linear-gradient(
+              145deg,
+              #4b170d,
+              #741d20
+            );
+          border: 1px solid rgba(255,255,255,.22);
+          box-shadow:
+            0 25px 80px rgba(0,0,0,.55);
+        }
+
+        .paymentModal h3 {
+          margin: 0;
+          font-size: 21px;
+          font-weight: 950;
+        }
+
+        .paymentSong {
+          margin-top: 8px;
+          font-size: 13px;
+          opacity: .8;
+        }
+
+        .paymentPrice {
+          margin-top: 15px;
+          padding: 14px;
+          border-radius: 15px;
+          background: rgba(255,255,255,.10);
+          font-size: 23px;
+          font-weight: 950;
+          text-align: center;
+        }
+
+        .paymentInfo {
+          margin-top: 13px;
+          font-size: 11px;
+          line-height: 1.6;
+          opacity: .78;
+        }
+
+        .paymentLabel {
+          display: block;
+          margin-top: 14px;
+          margin-bottom: 6px;
+          font-size: 9px;
+          font-weight: 950;
+          text-transform: uppercase;
+        }
+
+        .paymentSelect {
+          width: 100%;
+          padding: 12px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.2);
+          background: rgba(0,0,0,.25);
+          color: white;
+        }
+
+        .paymentSelect option {
+          color: #111;
+        }
+
+        .paymentActions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 9px;
+          margin-top: 16px;
+        }
+
+        .paymentBtn {
+          padding: 12px;
+          border: 0;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 950;
+          cursor: pointer;
+        }
+
+        .paymentBtn.primary {
+          background: #25d366;
+          color: #05210f;
+        }
+
+        .paymentBtn.cancel {
+          background: rgba(255,255,255,.12);
+          color: white;
+        }
+
         @media (max-width: 680px) {
           .featuredGrid {
             grid-template-columns: 1fr;
@@ -1236,6 +1514,10 @@ function App() {
           }
 
           .quickOrder {
+            grid-template-columns: 1fr;
+          }
+
+          .packageGrid {
             grid-template-columns: 1fr;
           }
 
@@ -1264,6 +1546,10 @@ function App() {
             right: 7px;
             bottom: 7px;
           }
+
+          .paymentActions {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
 
@@ -1271,11 +1557,16 @@ function App() {
         ref={audioRef}
         preload="metadata"
         onLoadedMetadata={(e) => {
-          setDuration(e.currentTarget.duration || 0);
+          setDuration(
+            e.currentTarget.duration || 0
+          );
+
           e.currentTarget.volume = volume;
         }}
         onTimeUpdate={(e) => {
-          setProgress(e.currentTarget.currentTime);
+          setProgress(
+            e.currentTarget.currentTime
+          );
         }}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
@@ -1300,6 +1591,7 @@ function App() {
       <div className="app">
 
         {/* HERO */}
+
         <header className="hero">
           <div className="avatar">
             <img
@@ -1353,6 +1645,7 @@ function App() {
         <main className="content">
 
           {/* FEATURED */}
+
           <section className="featured glass">
             <div className="sectionHeading">
               <div>
@@ -1380,7 +1673,7 @@ function App() {
                     <div className="featuredBadge">
                       {active && playing
                         ? "NOW PLAYING"
-                        : "🔥 FEATURED"}
+                        : "🔥 SAMPLE"}
                     </div>
 
                     <div className="featuredTitle">
@@ -1409,6 +1702,7 @@ function App() {
           </section>
 
           {/* MUSIC */}
+
           <section
             className="library"
             id="songs"
@@ -1428,7 +1722,6 @@ function App() {
               </div>
             </div>
 
-            {/* SEARCH */}
             <div className="searchWrap">
               <span className="searchIcon">
                 🔎
@@ -1446,7 +1739,6 @@ function App() {
               />
             </div>
 
-            {/* CATEGORIES */}
             <div className="cats">
               {CATS.map((item) => (
                 <button
@@ -1465,7 +1757,6 @@ function App() {
               ))}
             </div>
 
-            {/* SONG LIST */}
             <div className="songList">
               {filtered.map((song) => {
                 const active =
@@ -1490,6 +1781,7 @@ function App() {
                     </div>
 
                     <div className="songInfo">
+
                       <div className="songTitle">
                         {song.title}
                       </div>
@@ -1502,15 +1794,44 @@ function App() {
 
                       <div className="songActions">
 
-                        <a
-                          className="smallBtn download"
-                          href={musicFile(
-                            song.file
-                          )}
-                          download={song.file}
-                        >
-                          ⬇ Download
-                        </a>
+                        {song.status ===
+                          "sample" && (
+                          <button
+                            className="smallBtn sampleBtn"
+                            onClick={() =>
+                              play(song)
+                            }
+                          >
+                            🎧 Sample
+                          </button>
+                        )}
+
+                        {song.status ===
+                          "free" && (
+                          <a
+                            className="smallBtn download"
+                            href={musicFile(
+                              song.file
+                            )}
+                            download={song.file}
+                          >
+                            ⬇ Free Download
+                          </a>
+                        )}
+
+                        {song.status ===
+                          "paid" && (
+                          <button
+                            className="smallBtn download"
+                            onClick={() =>
+                              openPaidDownload(
+                                song
+                              )
+                            }
+                          >
+                            💳 500 UGX
+                          </button>
+                        )}
 
                         <button
                           className="smallBtn order"
@@ -1580,6 +1901,7 @@ function App() {
           </section>
 
           {/* CUSTOM SONG */}
+
           <section
             className="orderSection glass"
             id="custom"
@@ -1589,16 +1911,52 @@ function App() {
             </h2>
 
             <p className="orderIntro">
-              Want a song made around your
-              name, birthday, relationship,
-              friendship, graduation, event
-              or special message? Fill in the
-              details below and send your
-              request directly to Steve Wiizy
-              on WhatsApp.
+              Order a completely new song
+              created for your story, school,
+              birthday, graduation, dedication,
+              relationship, friendship, event,
+              organization or special message.
+              Custom songs start at 10,000 UGX.
             </p>
 
+            {/* PACKAGES */}
+
+            <div className="packageGrid">
+              {CUSTOM_PACKAGES.map(
+                (item) => (
+                  <button
+                    type="button"
+                    key={item.id}
+                    className={`package ${
+                      selectedPackage ===
+                      item.id
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setSelectedPackage(
+                        item.id
+                      )
+                    }
+                  >
+                    <div className="packageName">
+                      {item.name}
+                    </div>
+
+                    <div className="packagePrice">
+                      {item.label}
+                    </div>
+
+                    <div className="packageDescription">
+                      {item.description}
+                    </div>
+                  </button>
+                )
+              )}
+            </div>
+
             <form onSubmit={submitOrder}>
+
               <div className="formGrid">
 
                 <div className="field">
@@ -1634,7 +1992,7 @@ function App() {
                           e.target.value,
                       })
                     }
-                    placeholder="Birthday, love, graduation..."
+                    placeholder="Birthday, school song, graduation..."
                   />
                 </div>
 
@@ -1653,33 +2011,18 @@ function App() {
                       })
                     }
                   >
-                    <option>
-                      Love
-                    </option>
-
-                    <option>
-                      Birthday
-                    </option>
-
-                    <option>
-                      Gospel
-                    </option>
-
-                    <option>
-                      GenZ
-                    </option>
-
-                    <option>
-                      Motivation
-                    </option>
-
-                    <option>
-                      Vibe
-                    </option>
-
-                    <option>
-                      Dedicated
-                    </option>
+                    <option>Love</option>
+                    <option>Birthday</option>
+                    <option>School Song</option>
+                    <option>Graduation</option>
+                    <option>Dedication</option>
+                    <option>Gospel</option>
+                    <option>GenZ</option>
+                    <option>Motivation</option>
+                    <option>Vibe</option>
+                    <option>Friendship</option>
+                    <option>Event Song</option>
+                    <option>Other</option>
                   </select>
                 </div>
 
@@ -1716,33 +2059,14 @@ function App() {
                       })
                     }
                   >
-                    <option>
-                      Happy
-                    </option>
-
-                    <option>
-                      Romantic
-                    </option>
-
-                    <option>
-                      Emotional
-                    </option>
-
-                    <option>
-                      Inspirational
-                    </option>
-
-                    <option>
-                      Energetic
-                    </option>
-
-                    <option>
-                      Chill
-                    </option>
-
-                    <option>
-                      Spiritual
-                    </option>
+                    <option>Happy</option>
+                    <option>Romantic</option>
+                    <option>Emotional</option>
+                    <option>Inspirational</option>
+                    <option>Energetic</option>
+                    <option>Chill</option>
+                    <option>Spiritual</option>
+                    <option>Celebratory</option>
                   </select>
                 </div>
 
@@ -1790,47 +2114,27 @@ function App() {
                       })
                     }
                   >
-                    <option>
-                      English
-                    </option>
-
-                    <option>
-                      Luganda
-                    </option>
-
-                    <option>
-                      Swahili
-                    </option>
-
+                    <option>English</option>
+                    <option>Luganda</option>
+                    <option>Swahili</option>
                     <option>
                       English + Luganda
                     </option>
-
                     <option>
                       English + Swahili
                     </option>
-
-                    <option>
-                      Other
-                    </option>
+                    <option>Other</option>
                   </select>
                 </div>
 
                 <div className="field">
                   <label>
-                    Budget
+                    Selected Package
                   </label>
 
                   <input
-                    value={order.budget}
-                    onChange={(e) =>
-                      setOrder({
-                        ...order,
-                        budget:
-                          e.target.value,
-                      })
-                    }
-                    placeholder="e.g. 10,000 UGX"
+                    value={`${currentPackage.name} — ${currentPackage.label}`}
+                    readOnly
                   />
                 </div>
 
@@ -1848,7 +2152,7 @@ function App() {
                           e.target.value,
                       })
                     }
-                    placeholder="Tell Steve the names, story, message, people to mention, lyrics ideas or anything else you want in the song..."
+                    placeholder="Tell Steve the names, school, class, house, teachers, friends, story, message, people to mention, lyrics ideas or anything else you want in the NEW song..."
                   />
                 </div>
 
@@ -1857,16 +2161,16 @@ function App() {
               <div className="priceBox">
                 <div>
                   <div className="priceLabel">
-                    CUSTOM SONGS START FROM
+                    SELECTED CUSTOM PACKAGE
                   </div>
 
                   <div className="priceValue">
-                    10,000 UGX
+                    {currentPackage.label}
                   </div>
                 </div>
 
                 <div className="priceLabel">
-                  Negotiable
+                  {currentPackage.name}
                 </div>
               </div>
 
@@ -1874,19 +2178,20 @@ function App() {
                 className="submitOrder"
                 type="submit"
               >
-                💬 SEND CUSTOM ORDER ON WHATSAPP
+                💬 ORDER {currentPackage.label} ON WHATSAPP
               </button>
 
               <div className="quickOrder">
+
                 <a
                   className="quickBtn"
                   href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-                    "Hi Steve Wiizy 👋 I want to ask about custom songs."
+                    "Hi Steve Wiizy 👋 I want to ask about custom songs, including school songs and other new personalized songs."
                   )}`}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  💬 Ask About Pricing
+                  💬 Ask About Custom Songs
                 </a>
 
                 <a
@@ -1897,11 +2202,14 @@ function App() {
                 >
                   📲 Chat With Steve
                 </a>
+
               </div>
+
             </form>
           </section>
 
           {/* ABOUT */}
+
           <section className="about glass">
             <h2>
               ❤️ About Steve Wiizy
@@ -1914,18 +2222,20 @@ function App() {
               music and fresh GenZ sounds.
               Discover the music, share it
               with friends and request a
-              custom song for your special
-              moment.
+              completely new custom song for
+              your special moment, school or
+              event.
             </p>
 
             <div className="stats">
+
               <div className="stat">
                 <strong>
                   {SONGS.length}+
                 </strong>
 
                 <span>
-                  MUSIC TRACKS
+                  SAMPLE TRACKS
                 </span>
               </div>
 
@@ -1935,19 +2245,20 @@ function App() {
                 </strong>
 
                 <span>
-                  STARTING PRICE
+                  CUSTOM START
                 </span>
               </div>
 
               <div className="stat">
                 <strong>
-                  24H
+                  30K
                 </strong>
 
                 <span>
-                  TARGET DELIVERY
+                  CUSTOM MAX
                 </span>
               </div>
+
             </div>
           </section>
 
@@ -1960,9 +2271,11 @@ function App() {
           © 2026 Steve Wiizy. All rights
           reserved.
         </footer>
+
       </div>
 
       {/* FIXED MUSIC PLAYER */}
+
       {current && (
         <div className="player">
 
@@ -1975,6 +2288,7 @@ function App() {
             />
 
             <div className="playerInfo">
+
               <div className="playerTitle">
                 {current.emoji}{" "}
                 {current.title}
@@ -1985,6 +2299,7 @@ function App() {
                   ? "● NOW PLAYING"
                   : "Ⅱ PAUSED"}
               </div>
+
             </div>
 
             <div className="playerControls">
@@ -2032,12 +2347,10 @@ function App() {
               min="0"
               max={duration || 0}
               step="0.1"
-              value={
-                Math.min(
-                  progress,
-                  duration || 0
-                )
-              }
+              value={Math.min(
+                progress,
+                duration || 0
+              )}
               onChange={changeProgress}
             />
 
@@ -2055,6 +2368,95 @@ function App() {
               onChange={changeVolume}
               aria-label="Volume"
             />
+
+          </div>
+        </div>
+      )}
+
+      {/* PAID NEW SONG DOWNLOAD */}
+
+      {downloadSong && (
+        <div
+          className="modalOverlay"
+          onClick={() =>
+            setDownloadSong(null)
+          }
+        >
+          <div
+            className="paymentModal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+
+            <h3>
+              🆕 New Song Download
+            </h3>
+
+            <div className="paymentSong">
+              {downloadSong.emoji}{" "}
+              {downloadSong.title}
+            </div>
+
+            <div className="paymentPrice">
+              500 UGX
+            </div>
+
+            <div className="paymentInfo">
+              This is a newly released song.
+              The download price is 500 UGX.
+              Choose your preferred payment
+              method and continue to WhatsApp
+              for the payment instructions.
+            </div>
+
+            <label className="paymentLabel">
+              Payment Method
+            </label>
+
+            <select
+              className="paymentSelect"
+              value={paymentMethod}
+              onChange={(e) =>
+                setPaymentMethod(
+                  e.target.value
+                )
+              }
+            >
+              <option>
+                MTN Mobile Money
+              </option>
+
+              <option>
+                Airtel Money
+              </option>
+
+              <option>
+                Other / Ask Steve
+              </option>
+            </select>
+
+            <div className="paymentActions">
+
+              <button
+                className="paymentBtn primary"
+                onClick={
+                  continuePaidDownload
+                }
+              >
+                💳 Continue Payment
+              </button>
+
+              <button
+                className="paymentBtn cancel"
+                onClick={() =>
+                  setDownloadSong(null)
+                }
+              >
+                Cancel
+              </button>
+
+            </div>
 
           </div>
         </div>
