@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://steve-wiizy-music.vercel.app/sitemap.xml
