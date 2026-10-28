@@ -204,8 +204,17 @@ const SONGS = [
     emoji: "💿",
     status: "sample",
   },
+{
+  id: 18,
+  title: "We Are Ready Sisters Version",
+  file: "We Are Ready Sisters Version.mp3",
+  size: "6.4 MB",
+  dur: "4:49",
+  cat: "School Songs",
+  emoji: "🎓",
+  status: "paid",
+},
 
-  /*
     ADD NEW SONGS BELOW THIS LINE
 
     Example:
