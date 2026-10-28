@@ -204,36 +204,27 @@ const SONGS = [
     emoji: "💿",
     status: "sample",
   },
-{
-  id: 18,
-  title: "We Are Ready Sisters Version",
-  file: "We Are Ready Sisters Version.mp3",
-  size: "6.4 MB",
-  dur: "4:49",
-  cat: "School Songs",
-  emoji: "🎓",
-  status: "paid",
-},
 
+  {
+    id: 18,
+    title: "We Are Ready Sisters Version",
+    file: "We Are Ready Sisters Version.mp3",
+    size: "6.4 MB",
+    dur: "4:49",
+    cat: "School Songs",
+    emoji: "🎓",
+    status: "paid",
+  },
+
+  /*
     ADD NEW SONGS BELOW THIS LINE
 
-    Example:
+    To add another new song later,
+    use the next available ID.
 
-    {
-      id: 18,
-      title: "Your New Song",
-      file: "Your New Song.mp3",
-      size: "4.0 MB",
-      dur: "3:15",
-      cat: "Love",
-      emoji: "❤️",
-      status: "paid",
-    },
-
-    status:
-      "paid" = UGX 500 download
-      "free" = free download
-      "sample" = preview/sample only
+    "paid" = 500 UGX download
+    "sample" = preview only
+    "free" = free download
   */
 ];
 
