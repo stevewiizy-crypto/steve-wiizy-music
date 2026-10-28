@@ -245,6 +245,7 @@ const CATS = [
   "GenZ",
   "Motivation",
   "Vibe",
+  "School Songs",
   "Dedicated",
 ];
 
